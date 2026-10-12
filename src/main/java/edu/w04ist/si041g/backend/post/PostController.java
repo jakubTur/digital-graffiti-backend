@@ -27,6 +27,12 @@ public class PostController {
         return ResponseEntity.ok(postService.getAllPosts().stream().map(this::toPostResponseBody).toList());
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletePost(@PathVariable Long id) {
+        postService.deletePost(id);
+        return ResponseEntity.noContent().build();
+    }
+
     private PostResponseBody toPostResponseBody(Post post) {
         return new PostResponseBody(
                 post.getId(),

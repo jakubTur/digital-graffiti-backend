@@ -1,6 +1,9 @@
 package edu.w04ist.si041g.backend.user;
 
+import edu.w04ist.si041g.backend.post.Post;
+import edu.w04ist.si041g.backend.post.PostRepository;
 import edu.w04ist.si041g.backend.user.dto.UserRequestBody;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,6 +14,8 @@ import java.util.List;
 public class UserService {
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private PostRepository postRepository;
     public UserService() {}
 
     public User createUser(UserRequestBody user) {
@@ -39,9 +44,11 @@ public class UserService {
         return userRepository.save(existingUser);
     }
 
+    @Transactional
     public void deleteUser(Long id) {
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+        postRepository.deleteAllByUserId_Id(id);
         userRepository.delete(existingUser);
     }
 
