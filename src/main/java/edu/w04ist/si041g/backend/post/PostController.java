@@ -34,9 +34,9 @@ public class PostController {
                 post.getText(),
                 post.getPostedAt(),
                 post.getTextColor(),
-                post.getUsername(),
-                post.getLatitude(),
-                post.getLongitude()
+                post.getUserId().getNickname(),
+                post.getLocation().getCoordinate().getY(),
+                post.getLocation().getCoordinate().getX()
         );
     }
 }

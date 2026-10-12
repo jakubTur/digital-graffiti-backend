@@ -9,7 +9,7 @@ public class PostRequestBody {
     private String title;
     private String text;
     private String textColor;
-    private String username;
+    private Long userId;
     private Double latitude;
     private Double longitude;
 }

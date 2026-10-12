@@ -1,11 +1,13 @@
 package edu.w04ist.si041g.backend.post;
 
+import edu.w04ist.si041g.backend.user.User;
 import jakarta.persistence.*;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.locationtech.jts.geom.Point;
 
 import java.time.Instant;
 
@@ -23,7 +25,9 @@ public class Post {
     private String text;
     private Instant postedAt;
     private String textColor;
-    private String username;
-    private Double latitude;
-    private Double longitude;
+    @ManyToOne
+    @JoinColumn(name="poster_id", nullable = false)
+    private User userId;
+    @Column(name = "location", columnDefinition = "extensions.geography(Point, 4326)")
+    private Point location;
 }
