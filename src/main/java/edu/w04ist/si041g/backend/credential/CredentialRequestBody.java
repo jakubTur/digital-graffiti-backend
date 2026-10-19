@@ -8,5 +8,5 @@ public class CredentialRequestBody {
 
     private Long userId;
     private String login;
-    private String passwordHash;
+    private String password;
 }

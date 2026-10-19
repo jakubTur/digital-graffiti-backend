@@ -1,6 +1,7 @@
 
 package edu.w04ist.si041g.backend.credential;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import edu.w04ist.si041g.backend.credential.CredentialRequestBody;
 import edu.w04ist.si041g.backend.credential.CredentialResponseBody;
 import edu.w04ist.si041g.backend.user.User;
@@ -13,16 +14,21 @@ import java.util.List;
 @Service
 public class CredentialService {
 
+
     private final CredentialRepository credentialRepository;
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public CredentialService(
             CredentialRepository credentialRepository,
-            UserRepository userRepository
+            UserRepository userRepository,
+            PasswordEncoder passwordEncoder
     ) {
         this.credentialRepository = credentialRepository;
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
+
 
     @Transactional
     public CredentialResponseBody createCredential(
@@ -47,7 +53,9 @@ public class CredentialService {
         Credential credential = new Credential();
         credential.setUser(user);
         credential.setLogin(request.getLogin());
-        credential.setPasswordHash(request.getPasswordHash());
+        credential.setPasswordHash(
+                passwordEncoder.encode(request.getPassword())
+        );
 
         return toResponse(credentialRepository.save(credential));
     }
@@ -82,8 +90,10 @@ public class CredentialService {
             credential.setLogin(request.getLogin());
         }
 
-        if (request.getPasswordHash() != null) {
-            credential.setPasswordHash(request.getPasswordHash());
+        if (request.getPassword() != null) {
+            credential.setPasswordHash(
+                    passwordEncoder.encode(request.getPassword())
+            );
         }
 
         return toResponse(credentialRepository.save(credential));
@@ -106,9 +116,9 @@ public class CredentialService {
             throw new IllegalArgumentException("Login is required");
         }
 
-        if (request.getPasswordHash() == null
-                || request.getPasswordHash().isBlank()) {
-            throw new IllegalArgumentException("Password hash is required");
+        if (request.getPassword() == null
+                || request.getPassword().isBlank()) {
+            throw new IllegalArgumentException("Password is required");
         }
     }
 
@@ -119,4 +129,18 @@ public class CredentialService {
                 credential.getLogin()
         );
     }
+
+    public boolean verifyPassword(String login, String password) {
+        if (password == null) {
+            return false;
+        }
+
+        return credentialRepository.findByLogin(login)
+                .map(credential -> passwordEncoder.matches(
+                        password,
+                        credential.getPasswordHash()
+                ))
+                .orElse(false);
+    }
+
 }
