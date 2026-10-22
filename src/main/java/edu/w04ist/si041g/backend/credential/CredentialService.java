@@ -1,9 +1,8 @@
 
 package edu.w04ist.si041g.backend.credential;
 
+import edu.w04ist.si041g.backend.credential.dto.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import edu.w04ist.si041g.backend.credential.CredentialRequestBody;
-import edu.w04ist.si041g.backend.credential.CredentialResponseBody;
 import edu.w04ist.si041g.backend.user.User;
 import edu.w04ist.si041g.backend.user.UserRepository;
 import org.springframework.stereotype.Service;
@@ -32,9 +31,9 @@ public class CredentialService {
 
     @Transactional
     public CredentialResponseBody createCredential(
-            CredentialRequestBody request
+            RegisterCredentialRequest request
     ) {
-        User user = userRepository.findById(request.getUserId())
+        User user = userRepository.findByNickname(request.getLogin())
                 .orElseThrow(() ->
                         new IllegalArgumentException("User not found"));
 
@@ -112,6 +111,17 @@ public class CredentialService {
     }
 
     private void validateRequest(CredentialRequestBody request) {
+        if (request.getLogin() == null || request.getLogin().isBlank()) {
+            throw new IllegalArgumentException("Login is required");
+        }
+
+        if (request.getPassword() == null
+                || request.getPassword().isBlank()) {
+            throw new IllegalArgumentException("Password is required");
+        }
+    }
+
+    private void validateRequest(RegisterCredentialRequest request) {
         if (request.getLogin() == null || request.getLogin().isBlank()) {
             throw new IllegalArgumentException("Login is required");
         }
