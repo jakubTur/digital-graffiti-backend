@@ -1,5 +1,5 @@
 
-package edu.w04ist.si041g.backend.credential;
+package edu.w04ist.si041g.backend.credential.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
