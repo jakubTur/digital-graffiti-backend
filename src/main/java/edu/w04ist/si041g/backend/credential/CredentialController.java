@@ -1,7 +1,8 @@
 
 package edu.w04ist.si041g.backend.credential;
 
-import edu.w04ist.si041g.backend.credential.dto.*;
+import edu.w04ist.si041g.backend.credential.CredentialRequestBody;
+import edu.w04ist.si041g.backend.credential.CredentialResponseBody;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +21,7 @@ public class CredentialController {
 
     @PostMapping
     public ResponseEntity<CredentialResponseBody> createCredential(
-            @RequestBody RegisterCredentialRequest request) {
+            @RequestBody CredentialRequestBody request) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(credentialService.createCredential(request));
     }
