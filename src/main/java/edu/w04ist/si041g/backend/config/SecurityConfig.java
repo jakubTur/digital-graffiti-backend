@@ -25,14 +25,18 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/users/**",
-                                "/credentials/**"
+                                "/api/users/admin/**"
                         ).hasRole("ADMIN")
+                        .requestMatchers(
+                                "/posts/**"
+                        ).hasAnyRole("USER", "ADMIN")
                         .requestMatchers(
                                 "/auth/login",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
-                                "/actuator/health"
+                                "/actuator/health",
+                                "/api/users/register",
+                                "/api/credentials/**"
                         ).permitAll().anyRequest().authenticated()
                 )
                 .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class).build();

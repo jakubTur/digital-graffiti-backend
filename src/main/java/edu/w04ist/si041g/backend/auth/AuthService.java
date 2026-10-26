@@ -22,11 +22,11 @@ public class AuthService {
         this.jwtService = jwtService;
     }
     public LoginResponse login(LoginRequest loginRequest) {
-        if (loginRequest.getLogin() == null || loginRequest.getLogin().isBlank() || loginRequest.getPassword() == null || loginRequest.getPassword().isBlank()) {
+        if (loginRequest.getEmail() == null || loginRequest.getEmail().isBlank() || loginRequest.getPassword() == null || loginRequest.getPassword().isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Login and password must be provided");
 
         }
-        Credential credential = credentialRepository.findByLogin(loginRequest.getLogin())
+        Credential credential = credentialRepository.findByLogin(loginRequest.getEmail())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid login or password"));
         if (!passwordEncoder.matches(loginRequest.getPassword(), credential.getPasswordHash())) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid login or password");
