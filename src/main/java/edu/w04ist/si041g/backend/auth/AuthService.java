@@ -36,6 +36,6 @@ public class AuthService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User account is inactive");
         }
         String token = jwtService.createToken(user.getId(), credential.getLogin(), user.getRole().name());
-        return new LoginResponse(token, jwtService.getTokenLifetime().toSeconds(), user.getId(), credential.getLogin(), user.getRole().name());
+        return new LoginResponse(token, jwtService.getTokenLifetime().toSeconds(), user.getId(), user.getNickname(), user.getEmail(), user.getRole().name());
     }
 }
