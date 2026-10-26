@@ -23,9 +23,9 @@ public class User{
     @Column(unique = true, nullable = false)
     private String nickname;
     @Column(nullable = false)
-    private boolean active = true;
+    private boolean active = true; // not banned
     @Column(nullable = false)
-    private boolean verified = false;
+    private boolean verified = false; // email verification status
     @Column(unique = true, nullable = false)
     private String email;
     @Column(name = "created_at", nullable = false, updatable = false)
