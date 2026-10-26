@@ -2,6 +2,7 @@ package edu.w04ist.si041g.backend.user;
 
 import edu.w04ist.si041g.backend.user.dto.UserRequestBody;
 import edu.w04ist.si041g.backend.user.dto.UserResponseBody;
+import edu.w04ist.si041g.backend.user.dto.UserUpdateBody;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,7 +10,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/users")
 public class UserController {
     private final UserService userService;
 
@@ -17,17 +18,24 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping("/create")
+    @PostMapping("/register")
     public ResponseEntity<User> createUser(@RequestBody UserRequestBody user) {
         User createdUser = userService.createUser(user);
         return ResponseEntity.created(URI.create("/users/" + createdUser.getId())).build();
     }
 
+    @PostMapping("/admin/register")
+    public ResponseEntity<User> createAdmin(@RequestBody UserRequestBody user) {
+        User createdAdmin = userService.createAdmin(user);
+        return ResponseEntity.created(URI.create("/users/" + createdAdmin.getId())).build();
+    }
+
     @PutMapping("/update/{id}")
-    public ResponseEntity<User> updateUser(@RequestBody UserRequestBody user, @PathVariable Long id) {
+    public ResponseEntity<User> updateUser(@RequestBody UserUpdateBody user, @PathVariable Long id) {
         User updatedUser = userService.updateUser(user, id);
         return ResponseEntity.ok(updatedUser);
     }
+
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);

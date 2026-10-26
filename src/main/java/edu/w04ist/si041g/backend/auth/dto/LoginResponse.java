@@ -9,6 +9,7 @@ public class LoginResponse {
     private String token;
     private long expiresIn;
     private Long userId;
-    private String login;
+    private String nickname;
+    private String email;
     private String role;
 }
