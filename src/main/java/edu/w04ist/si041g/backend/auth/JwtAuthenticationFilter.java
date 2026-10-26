@@ -35,6 +35,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = header.substring(7);
         try {
             var claims = jwtService.parseToken(token);
+            if (!jwtService.isAccessToken(claims)) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "access token required");
+                return;
+            }
             Long userId = Long.parseLong(claims.getSubject());
             var user = userService.getUserById(userId);
             if (!user.isActive()) {

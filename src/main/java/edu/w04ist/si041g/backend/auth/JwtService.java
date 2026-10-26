@@ -15,22 +15,30 @@ import org.springframework.beans.factory.annotation.Value;
 @Service
 public class JwtService {
     private final SecretKey signingKey;
-    private final Duration tokenLifetime = Duration.ofHours(1); // Token lifetime of 1 hour
+    private final Duration accessTokenLifetime = Duration.ofMinutes(20); // Token lifetime of 1 hour
+    private final Duration refreshTokenLifetime = Duration.ofDays(30); // Token lifetime of 1 hour
     public JwtService(@Value("${JWT_SECRET}") String secret) {
         if  (secret == null || secret.length() < 32) {
             throw new IllegalArgumentException("Secret length must be at least 32 characters");
         }
         this.signingKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
-    public String createToken(Long userId, String login, String role) {
+
+    public String createAccessToken(Long userId, String login, String role) {
+        return createToken(userId, login, role,"access", accessTokenLifetime);
+    }
+    public String createRefreshToken(Long userId) {
+        return createToken(userId, null, null, "refresh", refreshTokenLifetime);
+    }
+    public String createToken(Long userId, String login, String role, String type, Duration lifetime) {
         Date now = new Date();
-        Date expiration = new Date(now.getTime() + tokenLifetime.toMillis());
         return Jwts.builder()
                 .subject(userId.toString())
+                .claim("type", type)
                 .claim("login", login)
                 .claim("role", role)
                 .issuedAt(now)
-                .expiration(expiration)
+                .expiration(new Date(now.getTime() + lifetime.toMillis()))
                 .signWith(signingKey)
                 .compact();
     }
@@ -41,7 +49,14 @@ public class JwtService {
                 .parseSignedClaims(token)
                 .getPayload();
     }
-    public Duration getTokenLifetime() {
-        return tokenLifetime;
+    public boolean isAccessToken(Claims claims) {
+        return "access".equals(claims.get("type", String.class));
+    }
+
+    public boolean isRefreshToken(Claims claims) {
+        return "refresh".equals(claims.get("type", String.class));
+    }
+    public Duration getAccessTokenLifetime() {
+        return accessTokenLifetime;
     }
 }
