@@ -32,7 +32,7 @@ public class CredentialService {
     public CredentialResponseBody createCredential(
             RegisterCredentialRequest request
     ) {
-        User user = userRepository.findByNickname(request.getLogin())
+        User user = userRepository.findByEmail(request.getLogin())
                 .orElseThrow(() ->
                         new IllegalArgumentException("User not found"));
 
@@ -43,7 +43,7 @@ public class CredentialService {
 
         if (credentialRepository.existsByLogin(request.getLogin())) {
             throw new IllegalArgumentException(
-                    "Login already exists");
+                    "Email is already used");
         }
 
         validateRequest(request);
