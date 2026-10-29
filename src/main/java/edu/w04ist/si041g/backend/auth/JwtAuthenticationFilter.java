@@ -54,4 +54,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid or expired token");
         }
     }
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path  = request.getServletPath();
+        return path.equals("/auth/login") || path.equals("/auth/register");
+    }
 }
