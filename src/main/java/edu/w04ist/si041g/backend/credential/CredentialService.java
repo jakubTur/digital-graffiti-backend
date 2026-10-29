@@ -32,7 +32,7 @@ public class CredentialService {
     public CredentialResponseBody createCredential(
             RegisterCredentialRequest request
     ) {
-        User user = userRepository.findByEmail(request.getLogin())
+        User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() ->
                         new IllegalArgumentException("User not found"));
 
@@ -41,7 +41,7 @@ public class CredentialService {
                     "User already has credentials");
         }
 
-        if (credentialRepository.existsByLogin(request.getLogin())) {
+        if (credentialRepository.existsByLogin(request.getEmail())) {
             throw new IllegalArgumentException(
                     "Email is already used");
         }
@@ -50,7 +50,7 @@ public class CredentialService {
 
         Credential credential = new Credential();
         credential.setUser(user);
-        credential.setLogin(request.getLogin());
+        credential.setLogin(request.getEmail());
         credential.setPasswordHash(
                 passwordEncoder.encode(request.getPassword())
         );
@@ -78,14 +78,14 @@ public class CredentialService {
     ) {
         Credential credential = findCredential(id);
 
-        if (request.getLogin() != null) {
-            if (!request.getLogin().equals(credential.getLogin())
-                    && credentialRepository.existsByLogin(request.getLogin())) {
+        if (request.getEmail() != null) {
+            if (!request.getEmail().equals(credential.getLogin())
+                    && credentialRepository.existsByLogin(request.getEmail())) {
                 throw new IllegalArgumentException(
                         "Login already exists");
             }
 
-            credential.setLogin(request.getLogin());
+            credential.setLogin(request.getEmail());
         }
 
         if (request.getPassword() != null) {
@@ -110,7 +110,7 @@ public class CredentialService {
     }
 
     private void validateRequest(CredentialRequestBody request) {
-        if (request.getLogin() == null || request.getLogin().isBlank()) {
+        if (request.getEmail() == null || request.getEmail().isBlank()) {
             throw new IllegalArgumentException("Login is required");
         }
 
@@ -121,7 +121,7 @@ public class CredentialService {
     }
 
     private void validateRequest(RegisterCredentialRequest request) {
-        if (request.getLogin() == null || request.getLogin().isBlank()) {
+        if (request.getEmail() == null || request.getEmail().isBlank()) {
             throw new IllegalArgumentException("Login is required");
         }
 
