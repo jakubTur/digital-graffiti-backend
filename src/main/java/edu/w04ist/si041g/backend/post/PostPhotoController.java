@@ -1,5 +1,6 @@
 
 package edu.w04ist.si041g.backend.post;
+import edu.w04ist.si041g.backend.post.dto.PhotoResponseBody;
 
 import edu.w04ist.si041g.backend.storage.SupabaseStorageService;
 import org.springframework.http.HttpStatus;
@@ -34,7 +35,7 @@ public class PostPhotoController {
             value = "/{postId}/photo",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
-    public PhotoResponse uploadPhoto(
+    public PhotoResponseBody uploadPhoto(
             @PathVariable Long postId,
             @RequestParam("file") MultipartFile file,
             Authentication authentication
@@ -52,7 +53,6 @@ public class PostPhotoController {
                         HttpStatus.NOT_FOUND, "Post not found"
                 ));
 
-        // Assumes Authentication.getName() is the user ID.
         Long currentUserId;
         try {
             currentUserId = Long.valueOf(authentication.getName());
@@ -103,8 +103,7 @@ public class PostPhotoController {
             throw ex;
         }
 
-        return new PhotoResponse(path);
+        return new PhotoResponseBody(path);
     }
 
-    public record PhotoResponse(String imagePath) {}
 }
