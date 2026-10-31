@@ -30,4 +30,6 @@ public class Post {
     private User userId;
     @Column(name = "location", columnDefinition = "extensions.geography(Point, 4326)")
     private Point location;
+    @Column(name = "image_path")
+    private String imagePath;
 }
