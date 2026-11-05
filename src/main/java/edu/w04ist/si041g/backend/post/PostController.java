@@ -45,4 +45,20 @@ public class PostController {
                 post.getLocation().getCoordinate().getX()
         );
     }
+
+    @GetMapping("/nearby")
+    public ResponseEntity<List<PostResponseBody>> getNearbyPosts(
+            @RequestParam double latitude,
+            @RequestParam double longitude,
+            @RequestParam(defaultValue = "1000") double radiusMeters
+    ) {
+        List<PostResponseBody> posts = postService
+                .getNearbyPosts(latitude, longitude, radiusMeters)
+                .stream()
+                .map(this::toPostResponseBody)
+                .toList();
+
+        return ResponseEntity.ok(posts);
+    }
+
 }

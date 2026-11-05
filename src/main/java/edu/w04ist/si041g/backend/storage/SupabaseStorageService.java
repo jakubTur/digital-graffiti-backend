@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 import java.io.ByteArrayInputStream;
@@ -91,4 +93,36 @@ public class SupabaseStorageService {
                         + bucket + "/" + path
         );
     }
+    public String createSignedUrl(String path) {
+        SignedUrlResult result = client.post()
+                .uri(URI.create(
+                        baseUrl + "/storage/v1/object/sign/"
+                                + bucket + "/" + path
+                ))
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(Map.of("expiresIn", 3600))
+                .retrieve()
+                .body(SignedUrlResult.class);
+
+        if (result == null || result.signedURL() == null) {
+            throw new IllegalStateException(
+                    "Could not generate photo URL"
+            );
+        }
+
+        String url = result.signedURL();
+
+        if (url.startsWith("https://")) {
+            return url;
+        }
+
+        return baseUrl
+                + (url.startsWith("/storage/v1/") ? "" : "/storage/v1")
+                + (url.startsWith("/") ? url : "/" + url);
+    }
+
+    private record SignedUrlResult(
+            @JsonProperty("signedURL") String signedURL
+    ) {}
+
 }

@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
+import edu.w04ist.si041g.backend.post.dto.PhotoUrlResponseBody;
 
 import java.io.IOException;
 
@@ -104,6 +105,31 @@ public class PostPhotoController {
         }
 
         return new PhotoResponseBody(path);
+    }
+
+    @GetMapping("/{postId}/photo-url")
+    public PhotoUrlResponseBody getPhotoUrl(
+            @PathVariable Long postId
+    ) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Post not found"
+                ));
+
+        if (post.getImagePath() == null
+                || post.getImagePath().isBlank()) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Post has no photo"
+            );
+        }
+
+        String url = storage.createSignedUrl(
+                post.getImagePath()
+        );
+
+        return new PhotoUrlResponseBody(url);
     }
 
 }
