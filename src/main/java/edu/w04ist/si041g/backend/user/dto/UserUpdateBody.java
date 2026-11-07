@@ -8,4 +8,5 @@ public class UserUpdateBody {
     private String email;
     private boolean verified;
     private boolean active;
+    private String bio;
 }

@@ -16,18 +16,17 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "posts_tmp")
+@Table(name = "posts_new_tmp")
 public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String title;
-    private String text;
     private Instant postedAt;
-    private String textColor;
     @ManyToOne
     @JoinColumn(name="poster_id", nullable = false)
     private User userId;
     @Column(name = "location", columnDefinition = "extensions.geography(Point, 4326)")
     private Point location;
+    @Column(name = "background_image_path")
+    private String backgroundImagePath;
 }

@@ -49,6 +49,9 @@ public class UserService {
         if (user.getEmail() != null) {
             existingUser.setEmail(user.getEmail());
         }
+        if (user.getBio() != null) {
+            existingUser.setBio(user.getBio());
+        }
         existingUser.setActive(user.isActive());
         existingUser.setVerified(user.isVerified());
         return userRepository.save(existingUser);

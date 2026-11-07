@@ -38,4 +38,8 @@ public class User{
             nullable = false
     )
     private UserRole role = UserRole.user;
+    @Column(nullable = true)
+    private String bio;
+    @Column(nullable = true, name = "profile_image_path")
+    private String profilePicturePath;
 }

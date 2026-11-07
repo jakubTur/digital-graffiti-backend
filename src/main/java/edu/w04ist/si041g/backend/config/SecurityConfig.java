@@ -27,9 +27,8 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/users/admin/**"
                         ).hasRole("ADMIN")
-                        .requestMatchers(
-                                "/posts/**"
-                        ).hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/api/posts/**")
+                        .hasAnyRole("USER", "ADMIN")
                         .requestMatchers(
                                 "/auth/login",
                                 "/swagger-ui/**",
