@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/posts")
@@ -20,9 +21,13 @@ public class PostController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Post> createPost(@RequestBody PostRequestBody post) {
+    public ResponseEntity<Map<String, Long>> createPost(@RequestBody PostRequestBody post) {
         Post createdPost = postService.createPost(post);
-        return ResponseEntity.created(URI.create("/api/posts/" + createdPost.getId())).build();
+        URI location = URI.create("/api/posts/" + createdPost.getId());
+
+        return ResponseEntity
+                .created(location)
+                .body(Map.of("id", createdPost.getId()));
     }
 
     @GetMapping("/all")
