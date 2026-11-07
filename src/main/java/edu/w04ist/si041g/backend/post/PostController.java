@@ -2,6 +2,7 @@ package edu.w04ist.si041g.backend.post;
 
 import edu.w04ist.si041g.backend.post.dto.PostRequestBody;
 import edu.w04ist.si041g.backend.post.dto.PostResponseBody;
+import edu.w04ist.si041g.backend.storage.SupabaseStorageService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,17 +10,19 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/posts")
+@RequestMapping("/api/posts")
 public class PostController {
     private final PostService postService;
-    public PostController(PostService postService) {
+    private final SupabaseStorageService storage;
+    public PostController(PostService postService, SupabaseStorageService storage) {
+        this.storage = storage;
         this.postService = postService;
     }
 
     @PostMapping("/create")
     public ResponseEntity<Post> createPost(@RequestBody PostRequestBody post) {
         Post createdPost = postService.createPost(post);
-        return ResponseEntity.created(URI.create("/posts/" + createdPost.getId())).build();
+        return ResponseEntity.created(URI.create("/api/posts/" + createdPost.getId())).build();
     }
 
     @GetMapping("/all")
@@ -34,13 +37,14 @@ public class PostController {
     }
 
     private PostResponseBody toPostResponseBody(Post post) {
+        String imageUrl = post.getBackgroundImagePath() == null
+                ? null
+                : storage.createSignedUrl(post.getBackgroundImagePath());
         return new PostResponseBody(
                 post.getId(),
-                post.getTitle(),
-                post.getText(),
                 post.getPostedAt(),
-                post.getTextColor(),
                 post.getUserId().getNickname(),
+                imageUrl,
                 post.getLocation().getCoordinate().getY(),
                 post.getLocation().getCoordinate().getX()
         );

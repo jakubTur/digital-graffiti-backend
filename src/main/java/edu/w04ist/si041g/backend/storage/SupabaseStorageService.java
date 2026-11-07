@@ -37,7 +37,7 @@ public class SupabaseStorageService {
                 .build();
     }
 
-    public String upload(Long postId, MultipartFile file)
+    public String upload(String type, Long postId, MultipartFile file)
             throws IOException {
 
         if (file.isEmpty() || file.getSize() > 5 * 1024 * 1024) {
@@ -67,7 +67,7 @@ public class SupabaseStorageService {
             );
         }
 
-        String path = "posts/" + postId + "/"
+        String path = type + "/" + postId + "/"
                 + UUID.randomUUID() + extension;
 
         client.post()

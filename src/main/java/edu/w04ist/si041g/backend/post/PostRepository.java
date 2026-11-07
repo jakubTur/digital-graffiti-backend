@@ -15,7 +15,7 @@ public interface PostRepository extends JpaRepository<Post,Long> {
 
     @Query(value = """
         SELECT p.*
-        FROM public.posts_tmp p
+        FROM public.posts_new_tmp p
         WHERE extensions.ST_DWithin(
             p.location,
             CAST(

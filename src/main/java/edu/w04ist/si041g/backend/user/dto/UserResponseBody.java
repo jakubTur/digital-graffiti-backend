@@ -5,5 +5,7 @@ public record UserResponseBody(
         boolean active,
         boolean verified,
         String email,
-        String role
+        String role,
+        String bio,
+        String imageUrl
 ) {}

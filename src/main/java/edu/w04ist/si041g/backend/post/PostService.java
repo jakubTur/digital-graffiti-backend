@@ -25,12 +25,9 @@ public class PostService {
 
     public Post createPost(PostRequestBody postRequestBody) {
         Post post = new Post();
-        post.setTitle(postRequestBody.getTitle());
-        post.setText(postRequestBody.getText());
         post.setUserId(userRepository.findById(postRequestBody.getUserId()).orElseThrow(() -> new RuntimeException("User not found")));
         post.setLocation(geom.createPoint(new Coordinate(postRequestBody.getLongitude(), postRequestBody.getLatitude())));
         post.setPostedAt(Instant.now());
-        post.setTextColor(postRequestBody.getTextColor());
         return postRepository.save(post);
     }
 
