@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -29,4 +31,6 @@ public class Drawing {
     private Post post;
     @Column(name = "image_path")
     private String imagePath;
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Instant createdAt = Instant.now();
 }
