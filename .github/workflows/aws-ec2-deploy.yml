@@ -1,0 +1,39 @@
+# Name of the workflow visible in the GitHub Actions dashboard
+name: Build and Deploy on EC2 (Dev Branch)
+
+# Trigger this workflow automatically on every push to the dev branch
+on:
+  push:
+    branches: [ "dev" ]
+
+jobs:
+  deploy-to-ec2:
+    name: SSH to EC2, Pull, Build, and Restart
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step: Connect to the EC2 server via SSH and run deployment commands
+      - name: Execute remote deployment script via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            # Navigate into the project deployment directory on the EC2 instance
+            cd spring-app/
+            
+            # Fetch the latest code changes from the remote dev branch
+            git fetch origin dev
+            
+            # Reset local working tree to match the fetched dev branch cleanly
+            git reset --hard origin/dev
+            
+            # Build the Docker image locally using the updated source code and Dockerfile
+            docker compose build --no-cache
+            
+            # Restart the container in detached mode, recreating it with the new local image
+            docker compose up -d --remove-orphans
+            
+            # Clean up old, dangling, or unused build cache and images to save disk space on EC2
+            docker system prune -f

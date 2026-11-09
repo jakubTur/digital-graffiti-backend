@@ -2,24 +2,32 @@ package edu.w04ist.si041g.backend.post;
 
 import edu.w04ist.si041g.backend.post.dto.PostRequestBody;
 import edu.w04ist.si041g.backend.post.dto.PostResponseBody;
+import edu.w04ist.si041g.backend.storage.SupabaseStorageService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 @RestController
-@RequestMapping("/posts")
+@RequestMapping("/api/posts")
 public class PostController {
     private final PostService postService;
-    public PostController(PostService postService) {
+    private final SupabaseStorageService storage;
+    public PostController(PostService postService, SupabaseStorageService storage) {
+        this.storage = storage;
         this.postService = postService;
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Post> createPost(@RequestBody PostRequestBody post) {
+    public ResponseEntity<Map<String, Long>> createPost(@RequestBody PostRequestBody post) {
         Post createdPost = postService.createPost(post);
-        return ResponseEntity.created(URI.create("/posts/" + createdPost.getId())).build();
+        URI location = URI.create("/api/posts/" + createdPost.getId());
+
+        return ResponseEntity
+                .created(location)
+                .body(Map.of("id", createdPost.getId()));
     }
 
     @GetMapping("/all")
@@ -27,16 +35,39 @@ public class PostController {
         return ResponseEntity.ok(postService.getAllPosts().stream().map(this::toPostResponseBody).toList());
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletePost(@PathVariable Long id) {
+        postService.deletePost(id);
+        return ResponseEntity.noContent().build();
+    }
+
     private PostResponseBody toPostResponseBody(Post post) {
+        String imageUrl = post.getBackgroundImagePath() == null
+                ? null
+                : storage.createSignedUrl(post.getBackgroundImagePath());
         return new PostResponseBody(
                 post.getId(),
-                post.getTitle(),
-                post.getText(),
                 post.getPostedAt(),
-                post.getTextColor(),
-                post.getUsername(),
-                post.getLatitude(),
-                post.getLongitude()
+                post.getUserId().getNickname(),
+                imageUrl,
+                post.getLocation().getCoordinate().getY(),
+                post.getLocation().getCoordinate().getX()
         );
     }
+
+    @GetMapping("/nearby")
+    public ResponseEntity<List<PostResponseBody>> getNearbyPosts(
+            @RequestParam double latitude,
+            @RequestParam double longitude,
+            @RequestParam(defaultValue = "1000") double radiusMeters
+    ) {
+        List<PostResponseBody> posts = postService
+                .getNearbyPosts(latitude, longitude, radiusMeters)
+                .stream()
+                .map(this::toPostResponseBody)
+                .toList();
+
+        return ResponseEntity.ok(posts);
+    }
+
 }
