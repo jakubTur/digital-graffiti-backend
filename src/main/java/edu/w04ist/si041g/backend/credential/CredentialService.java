@@ -103,21 +103,32 @@ public class CredentialService {
         credentialRepository.delete(credential);
     }
 
+    @Transactional
+    public void updateEmail(Long userId, String newEmail) {
+        Credential credential = credentialRepository.findByUser_Id(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Credential not found for user ID: " + userId));
+
+        if (credentialRepository.existsByLogin(newEmail)) {
+            throw new IllegalArgumentException("Email is already used");
+        }
+
+        credential.setLogin(newEmail);
+        credentialRepository.save(credential);
+    }
+
+    @Transactional
+    public void updatePassword(Long userId, String newPassword) {
+        Credential credential = credentialRepository.findByUser_Id(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Credential not found for user ID: " + userId));
+
+        credential.setPasswordHash(passwordEncoder.encode(newPassword));
+        credentialRepository.save(credential);
+    }
+
     private Credential findCredential(Long id) {
         return credentialRepository.findById(id)
                 .orElseThrow(() ->
                         new IllegalArgumentException("Credential not found"));
-    }
-
-    private void validateRequest(CredentialRequestBody request) {
-        if (request.getEmail() == null || request.getEmail().isBlank()) {
-            throw new IllegalArgumentException("Login is required");
-        }
-
-        if (request.getPassword() == null
-                || request.getPassword().isBlank()) {
-            throw new IllegalArgumentException("Password is required");
-        }
     }
 
     private void validateRequest(RegisterCredentialRequest request) {
