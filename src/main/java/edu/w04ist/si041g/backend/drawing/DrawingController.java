@@ -44,7 +44,8 @@ public class DrawingController {
                 drawing.getOrigin() == null
                         ? null
                         : drawing.getOrigin().getId(),
-                imageUrl
+                imageUrl,
+                drawing.getCreatedAt()
         );
     }
 }

@@ -48,6 +48,8 @@ public class PostPhotoController {
             @RequestParam("file") MultipartFile file,
             Authentication authentication
     ) throws IOException {
+        System.out.println("authentication name: " + authentication.getName());
+
 
         if (authentication == null
                 || !authentication.isAuthenticated()) {
@@ -60,7 +62,8 @@ public class PostPhotoController {
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Post not found"
                 ));
-
+        System.out.println("post owner id: " + post.getUserId().getId());
+        System.out.println("requested post id: " + postId);
         Long currentUserId;
         try {
             currentUserId = Long.valueOf(authentication.getName());
