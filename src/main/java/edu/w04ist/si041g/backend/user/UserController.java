@@ -2,6 +2,7 @@ package edu.w04ist.si041g.backend.user;
 
 import edu.w04ist.si041g.backend.common.image.dto.PhotoResponseBody;
 import edu.w04ist.si041g.backend.storage.SupabaseStorageService;
+import edu.w04ist.si041g.backend.user.dto.FirebaseToken;
 import edu.w04ist.si041g.backend.user.dto.UserRequestBody;
 import edu.w04ist.si041g.backend.user.dto.UserResponseBody;
 import edu.w04ist.si041g.backend.user.dto.UserUpdateBody;
@@ -44,13 +45,19 @@ public class UserController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<User> updateUser(@RequestBody UserUpdateBody user, @PathVariable Long id) {
+    public ResponseEntity<User> updateUser(@RequestBody UserUpdateBody user, @PathVariable Long id, Authentication authentication) {
+        if (!Long.valueOf(authentication.getName()).equals(id)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only update your own account");
+        }
         User updatedUser = userService.updateUser(user, id);
         return ResponseEntity.ok(updatedUser);
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id, Authentication authentication) {
+        if (!Long.valueOf(authentication.getName()).equals(id)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only delete your own account");
+        }
         userService.deleteUser(id);
         return ResponseEntity.ok().build();
     }
@@ -72,6 +79,12 @@ public class UserController {
                 .map(this::toUserResponseBody)
                 .toList();
         return ResponseEntity.ok(responseBodies);
+    }
+    @PostMapping("/fire")
+    public ResponseEntity<Void> updateToken(Authentication authentication, @RequestBody FirebaseToken token) {
+        Long userId = Long.valueOf(authentication.getName());
+        userService.updateFireToken(userId, token.getToken());
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping(
