@@ -59,6 +59,11 @@ public class UserController {
         User user = userService.getUserById(id);
         return ResponseEntity.ok(toUserResponseBody(user));
     }
+    @GetMapping("/nickname/{nickname}")
+    public ResponseEntity<UserResponseBody> getUserByNickname(@PathVariable String nickname) {
+        User user = userService.getUserByNickname(nickname);
+        return ResponseEntity.ok(toUserResponseBody(user));
+    }
 
     @GetMapping("/all")
     public ResponseEntity<List<UserResponseBody>> getAllUsers() {
