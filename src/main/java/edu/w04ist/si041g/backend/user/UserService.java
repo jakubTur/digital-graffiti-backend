@@ -40,6 +40,11 @@ public class UserService {
         return userRepository.save(newAdmin);
     }
 
+    public User getUserByNickname(String nickname) {
+        return userRepository.findByNickname(nickname)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
     public User updateUser(UserUpdateBody user, Long id) {
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
