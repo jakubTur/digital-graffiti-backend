@@ -32,7 +32,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/users/admin/**"
                         ).hasRole("ADMIN")
-                        .requestMatchers("/api/posts/**", "/api/users/**")
+                        .requestMatchers("/api/posts/**", "/api/users/**", "/api/relations/**")
                         .hasAnyRole("USER", "ADMIN")
                         .requestMatchers(
                                 "/auth/login",
