@@ -28,6 +28,12 @@ public class UserService {
         newUser.setRole(UserRole.user);
         return userRepository.save(newUser);
     }
+    public void updateFireToken(Long userId, String fireToken) {
+        User existingUser = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        existingUser.setFirebaseToken(fireToken);
+        userRepository.save(existingUser);
+    }
 
     public User createAdmin(UserRequestBody admin) {
         User newAdmin = new User();

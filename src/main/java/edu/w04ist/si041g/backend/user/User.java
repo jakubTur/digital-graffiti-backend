@@ -42,4 +42,6 @@ public class User{
     private String bio;
     @Column(nullable = true, name = "profile_image_path")
     private String profilePicturePath;
+    @Column(name = "firebase_token")
+    private String firebaseToken;
 }
