@@ -44,6 +44,18 @@ public class CredentialController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCredential(@PathVariable Long id) {
         credentialService.deleteCredential(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/email/{userId}")
+    public ResponseEntity<Void> updateEmail(@PathVariable Long userId, @RequestBody CredentialRequestBody request) {
+        credentialService.updateEmail(userId, request.getEmail());
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/password/{userId}")
+    public ResponseEntity<Void> updatePassword(@PathVariable Long userId, @RequestBody CredentialRequestBody request) {
+        credentialService.updatePassword(userId, request.getPassword());
+        return ResponseEntity.ok().build();
     }
 }

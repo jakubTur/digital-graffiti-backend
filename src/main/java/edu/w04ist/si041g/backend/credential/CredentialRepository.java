@@ -9,6 +9,8 @@ public interface CredentialRepository
 
     Optional<Credential> findByLogin(String login);
 
+    Optional<Credential> findByUser_Id(Long userId);
+
     boolean existsByLogin(String login);
 
     boolean existsByUser_Id(Long userId);

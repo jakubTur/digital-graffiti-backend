@@ -98,10 +98,7 @@ public class UserController {
         }
 
         if (user.getProfilePicturePath() != null) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
-                    "Profile picture is already present"
-            );
+            storage.delete(user.getProfilePicturePath());
         }
 
         String path = storage.upload("profiles", userId, file);
@@ -111,7 +108,6 @@ public class UserController {
                     UPDATE public.users
                     SET profile_image_path = ?
                     WHERE id = ?
-                      AND profile_image_path IS NULL
                     """, path, currentUserId);
 
             if (updated != 1) {
