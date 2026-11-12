@@ -42,10 +42,14 @@ public class RelationController {
 
     private RelationResponse toRelationResponse(Relation relation) {
         if  (relation == null) return new RelationResponse(
-            "NONE"
+            null,
+            null,
+            "none"
         );
         return new RelationResponse(
-            relation.getSender().getNickname()
+            relation.getSender().getNickname(),
+            relation.getReceiver().getNickname(),
+            relation.getStatus().toString()
         );
     }
 }
