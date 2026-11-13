@@ -21,5 +21,9 @@ WORKDIR /app
 
 # Copy only the compiled JAR file from the build stage, avoiding heavy JDK tools
 COPY --from=build /app/target/*.jar app.jar
+
+# COPY the JSON file from the host project folder into the container's /app/data directory
+COPY --from=build /app/src/main/resources/digitalgraffiti-9aec4-firebase-adminsdk-fbsvc-7aafca3741.json /app/data/digitalgraffiti-9aec4-firebase-adminsdk-fbsvc-7aafca3741.json
+
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
