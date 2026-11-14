@@ -38,6 +38,11 @@ public class RelationController {
         Relation relation = relationService.getRelationBetween(firstId, secondId);
         return ResponseEntity.ok(toRelationResponse(relation));
     }
+    @GetMapping("/between/nicknames/{firstNickname}/{secondNickname}")
+    ResponseEntity<RelationResponse> getRelationBetweenNicknames(@PathVariable("firstNickname") String firstNickname, @PathVariable("secondNickname") String secondNickname) {
+        Relation relation = relationService.getRelationBetweenNicknames(firstNickname, secondNickname);
+        return ResponseEntity.ok(toRelationResponse(relation));
+    }
 
 
     private RelationResponse toRelationResponse(Relation relation) {

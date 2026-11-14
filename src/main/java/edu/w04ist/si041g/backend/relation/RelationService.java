@@ -5,7 +5,6 @@ import edu.w04ist.si041g.backend.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.management.relation.RelationType;
 import java.time.Instant;
 import java.util.List;
 
@@ -41,6 +40,11 @@ public class RelationService {
     }
     public Relation getRelationBetween(Long firstId, Long secondId) {
         return relationRepository.findByInviterAndInvitee(firstId, secondId)
+                .orElse(null);
+    }
+
+    public Relation getRelationBetweenNicknames(String firstNickname, String secondNickname) {
+        return relationRepository.findByInviterAndInviteeNicknames(firstNickname, secondNickname)
                 .orElse(null);
     }
 }
