@@ -1,5 +1,6 @@
 package edu.w04ist.si041g.backend.relation;
 
+import edu.w04ist.si041g.backend.relation.dto.RelationNicknameRequest;
 import edu.w04ist.si041g.backend.relation.dto.RelationRequest;
 import edu.w04ist.si041g.backend.relation.dto.RelationResponse;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +26,25 @@ public class RelationController {
         Relation relation = relationService.createRelation(relationRequest);
         return ResponseEntity.created(URI.create("/relations/" + relation.getId())).build();
     }
+
+    @PostMapping("/nicknames")
+    ResponseEntity<Relation> createRelationByNicknames(@RequestBody RelationNicknameRequest relationRequest) {
+        Relation relation = relationService.createRelationByNicknames(relationRequest);
+        return ResponseEntity.created(URI.create("/relations/" + relation.getId())).build();
+    }
+
+    @PutMapping
+    ResponseEntity<Relation> updateRelation(@RequestBody RelationNicknameRequest request) {
+        Relation updatedRelation = relationService.updateRelation(request);
+        return ResponseEntity.ok(updatedRelation);
+    }
+
+    @DeleteMapping("/{firstNickname}/{secondNickname}")
+    ResponseEntity<Void> deleteRelation(@PathVariable String firstNickname, @PathVariable String secondNickname) {
+        relationService.deleteRelation(firstNickname, secondNickname);
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/{id}/{type}")
     ResponseEntity<List<RelationResponse>> getRelations(@PathVariable("id") Long id, @PathVariable("type") String type) {
         List<Relation> relations = relationService.getRelationsOf(id, type);
