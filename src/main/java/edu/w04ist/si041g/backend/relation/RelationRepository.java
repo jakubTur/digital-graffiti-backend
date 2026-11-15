@@ -26,12 +26,11 @@ public interface RelationRepository extends JpaRepository<Relation, Long> {
     """, nativeQuery = true)
     Optional<Relation> findByInviterAndInvitee(@Param("firstId") Long firstId, @Param("secondId") Long secondId);
 
-    @Query(value =
-"""
-        SELECT r.*
-        FROM public.user_relations r
-        WHERE (r.inviter = :firstNickname AND r.invitee = :secondNickname)
-           OR (r.inviter = :secondNickname AND r.invitee = :firstNickname)
-""", nativeQuery = true)
+    @Query("""
+        SELECT r
+        FROM Relation r
+        WHERE (r.sender.nickname = :firstNickname AND r.receiver.nickname = :secondNickname)
+           OR (r.sender.nickname = :secondNickname AND r.receiver.nickname = :firstNickname)
+        """)
     Optional<Relation> findByInviterAndInviteeNicknames(@Param("firstNickname") String firstNickname, @Param("secondNickname") String secondNickname);
 }
