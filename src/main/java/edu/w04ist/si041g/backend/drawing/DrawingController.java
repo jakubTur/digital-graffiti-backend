@@ -4,6 +4,7 @@ import edu.w04ist.si041g.backend.drawing.dto.DrawingRequestBody;
 import edu.w04ist.si041g.backend.drawing.dto.DrawingResponseBody;
 import edu.w04ist.si041g.backend.storage.SupabaseStorageService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,7 +24,11 @@ public class DrawingController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<DrawingResponseBody> addDrawing(@RequestBody DrawingRequestBody drawingRequestBody) {
+    public ResponseEntity<DrawingResponseBody> addDrawing(@RequestBody DrawingRequestBody drawingRequestBody, Authentication authentication) {
+        if (!Long.valueOf(authentication.getName()).equals(drawingRequestBody.getUserId())) {
+            return ResponseEntity.status(403).build();
+        }
+
         Drawing createdDrawing = drawingService.addDrawing(drawingRequestBody);
         return ResponseEntity.ok(toDrawingResponseBody(createdDrawing));
     }

@@ -3,6 +3,7 @@ package edu.w04ist.si041g.backend.relation;
 import edu.w04ist.si041g.backend.relation.dto.RelationRequest;
 import edu.w04ist.si041g.backend.relation.dto.RelationResponse;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -21,7 +22,11 @@ public class RelationController {
     }
 
     @PostMapping
-    ResponseEntity<Relation> createRelation(@RequestBody RelationRequest relationRequest) {
+    ResponseEntity<Relation> createRelation(@RequestBody RelationRequest relationRequest, Authentication authentication) {
+        if (!Long.valueOf(authentication.getName()).equals(relationRequest.getSenderId())) {
+            return ResponseEntity.status(403).build();
+        }
+
         Relation relation = relationService.createRelation(relationRequest);
         return ResponseEntity.created(URI.create("/relations/" + relation.getId())).build();
     }

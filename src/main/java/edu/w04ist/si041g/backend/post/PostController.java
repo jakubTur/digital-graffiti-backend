@@ -4,6 +4,7 @@ import edu.w04ist.si041g.backend.post.dto.PostRequestBody;
 import edu.w04ist.si041g.backend.post.dto.PostResponseBody;
 import edu.w04ist.si041g.backend.storage.SupabaseStorageService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -21,7 +22,10 @@ public class PostController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Map<String, Long>> createPost(@RequestBody PostRequestBody post) {
+    public ResponseEntity<Map<String, Long>> createPost(@RequestBody PostRequestBody post, Authentication authentication) {
+        if (!Long.valueOf(authentication.getName()).equals(post.getUserId())) {
+            return ResponseEntity.status(403).build();
+        }
         Post createdPost = postService.createPost(post);
         URI location = URI.create("/api/posts/" + createdPost.getId());
 
@@ -36,7 +40,11 @@ public class PostController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePost(@PathVariable Long id) {
+    public ResponseEntity<Void> deletePost(@PathVariable Long id, Authentication authentication) {
+        Post post = postService.getPostById(id);
+        if (!Long.valueOf(authentication.getName()).equals(post.getUserId().getId())) {
+            return ResponseEntity.status(403).build();
+        }
         postService.deletePost(id);
         return ResponseEntity.noContent().build();
     }
