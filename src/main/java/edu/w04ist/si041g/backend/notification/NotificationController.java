@@ -29,7 +29,7 @@ public class NotificationController {
     public ResponseEntity<Void> markNotificationAsRead(@PathVariable String notificationId, Authentication authentication) {
         Long userId = Long.parseLong(authentication.getName());
         notificationStoreService.markAsRead(userId, notificationId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     private NotificationResponse toNotificationResponse(QueryDocumentSnapshot notification) {

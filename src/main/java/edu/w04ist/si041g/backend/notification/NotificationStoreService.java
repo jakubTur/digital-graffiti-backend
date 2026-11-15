@@ -1,9 +1,6 @@
 package edu.w04ist.si041g.backend.notification;
 
-import com.google.cloud.firestore.DocumentReference;
-import com.google.cloud.firestore.FieldValue;
-import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.QueryDocumentSnapshot;
+import com.google.cloud.firestore.*;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -19,7 +16,7 @@ public class NotificationStoreService {
     public NotificationStoreService(Firestore firestore) {
         this.firestore = firestore;
     }
-    public String createNotification(Long recipientId, String title, String body, String type, String referenceId){
+    public void createNotification(Long recipientId, String title, String body, String type, String referenceId){
         String notificationId = UUID.randomUUID().toString();
         Map<String,Object> notification = new HashMap<>();
         notification.put("title", title);
@@ -35,7 +32,6 @@ public class NotificationStoreService {
                 .document(notificationId);
         try {
             document.set(notification).get();
-            return notificationId;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new IllegalStateException("Saving was interrupted",e);
@@ -49,6 +45,7 @@ public class NotificationStoreService {
                     .collection("notifications")
                     .document(String.valueOf(userId))
                     .collection("userNotifications")
+                    .orderBy("createdAt", Query.Direction.DESCENDING)
                     .get()
                     .get()
                     .getDocuments();

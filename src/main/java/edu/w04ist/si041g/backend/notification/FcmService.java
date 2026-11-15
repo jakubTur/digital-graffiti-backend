@@ -1,6 +1,7 @@
 package edu.w04ist.si041g.backend.notification;
 
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
 import org.springframework.stereotype.Service;
 
@@ -8,7 +9,7 @@ import com.google.firebase.messaging.Notification;
 
 @Service
 public class FcmService {
-    public String sendNotification(String targetToken, String title, String body, String type, String referenceId) throws Exception {
+    public String sendNotification(String targetToken, String title, String body, String type, String referenceId) throws FirebaseMessagingException {
         Notification notification = Notification.builder()
                 .setTitle(title)
                 .setBody(body)
