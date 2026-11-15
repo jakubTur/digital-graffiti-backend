@@ -8,9 +8,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestBody("/api/notifications")
+@RequestMapping("/api/notifications")
 public class NotificationController {
-    NotificationStoreService notificationStoreService;
+    private final NotificationStoreService notificationStoreService;
+
+    public NotificationController(NotificationStoreService notificationStoreService) {
+        this.notificationStoreService = notificationStoreService;
+    }
 
     @GetMapping
     public ResponseEntity<List<QueryDocumentSnapshot>> getAllNotifications(Authentication authentication) {
