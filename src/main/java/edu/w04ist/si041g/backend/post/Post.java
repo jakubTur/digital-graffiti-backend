@@ -21,6 +21,7 @@ public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(name = "posted_at", nullable = false, updatable = false)
     private Instant postedAt;
     @ManyToOne
     @JoinColumn(name="poster_id", nullable = false)
@@ -29,4 +30,6 @@ public class Post {
     private Point location;
     @Column(name = "background_image_path")
     private String backgroundImagePath;
+    @Column(name = "active", nullable = false)
+    private Boolean active;
 }

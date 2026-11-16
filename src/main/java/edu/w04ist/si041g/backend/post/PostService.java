@@ -28,6 +28,7 @@ public class PostService {
         post.setUserId(userRepository.findById(postRequestBody.getUserId()).orElseThrow(() -> new RuntimeException("User not found")));
         post.setLocation(geom.createPoint(new Coordinate(postRequestBody.getLongitude(), postRequestBody.getLatitude())));
         post.setPostedAt(Instant.now());
+        post.setActive(true);
         return postRepository.save(post);
     }
 
@@ -45,7 +46,9 @@ public class PostService {
     }
 
     public void deletePost(Long id) {
-        postRepository.deleteById(id);
+        Post post = getPostById(id);
+        post.setActive(false);
+        postRepository.save(post);
     }
 
 

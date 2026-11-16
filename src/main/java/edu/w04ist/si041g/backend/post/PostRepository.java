@@ -11,8 +11,7 @@ import java.util.List;
 public interface PostRepository extends JpaRepository<Post,Long> {
 
     void deleteAllByUserId_Id(Long userId);
-
-
+    List<Post> findAllByUserId_IdAndActive(Long userId, boolean active);
     @Query(value = """
         SELECT p.*
         FROM public.posts_new_tmp p
