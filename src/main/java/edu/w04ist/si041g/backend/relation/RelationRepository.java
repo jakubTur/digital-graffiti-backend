@@ -20,7 +20,7 @@ public interface RelationRepository extends JpaRepository<Relation, Long> {
     List<Relation> findAllBySender_IdAndStatus(Long senderId, RelationStatus status);
     @Query(value = """
         SELECT r.*
-        FROM public.user_relations r
+        FROM public.user_relations_new r
         WHERE (r.inviter = :firstId AND r.invitee = :secondId)
            OR (r.inviter = :secondId AND r.invitee = :firstId)
     """, nativeQuery = true)
@@ -31,7 +31,7 @@ public interface RelationRepository extends JpaRepository<Relation, Long> {
             WHEN r.inviter = :userId THEN r.invitee
             ELSE r.inviter
         END AS friend_id
-        FROM public.user_relations r
+        FROM public.user_relations_new r
         WHERE (r.inviter = :userId OR r.invitee = :userId)
           AND r.status = 'accepted'
     """, nativeQuery = true)
