@@ -60,10 +60,7 @@ public class RelationService {
         } catch (IllegalArgumentException e) {
             throw new RuntimeException("Invalid relation status: " + status);
         }
-        if (relationStatus == RelationStatus.accepted) {
-            return relationRepository.findRelationsByUserIdAndStatus(id, relationStatus);
-        }
-        return relationRepository.findAllBySender_IdAndStatus(id, relationStatus);
+        return relationRepository.findRelationsByUserIdAndStatus(id, relationStatus);
     }
     public Relation getRelationBetween(Long firstId, Long secondId) {
         return relationRepository.findByInviterAndInvitee(firstId, secondId)
