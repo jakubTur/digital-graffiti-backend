@@ -30,4 +30,16 @@ public class DrawingService {
     public List<Drawing> getDrawingByPostId(Long postId){
         return drawingRepository.findByPostId(postId);
     }
+    public Drawing getDrawingById(Long id){
+        return drawingRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Drawing not found"));
+    }
+    public void deleteDrawing(Long id){
+        Drawing drawing = getDrawingById(id);
+        if (drawing == null) {
+            return;
+        }
+        drawing.setActive(false);
+        drawingRepository.save(drawing);
+    }
 }

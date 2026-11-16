@@ -15,7 +15,7 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "drawings")
+@Table(name = "drawings_new_tmp_final")
 public class Drawing {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

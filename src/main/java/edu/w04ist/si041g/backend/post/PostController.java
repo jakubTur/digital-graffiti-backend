@@ -110,7 +110,8 @@ public class PostController {
                 post.getUserId().getNickname(),
                 imageUrl,
                 post.getLocation().getCoordinate().getY(),
-                post.getLocation().getCoordinate().getX()
+                post.getLocation().getCoordinate().getX(),
+                post.getActive()
         );
     }
 

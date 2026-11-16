@@ -98,7 +98,8 @@ public class DrawingController {
                         ? null
                         : drawing.getOrigin().getId(),
                 imageUrl,
-                drawing.getCreatedAt()
+                drawing.getCreatedAt(),
+                drawing.getActive()
         );
     }
 }
