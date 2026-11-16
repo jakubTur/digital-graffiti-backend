@@ -48,8 +48,8 @@ public class PostController {
             try {
                 notificationStoreService.createNotification(
                         friend.getId(),
-                        createdPost.getUserId().getNickname() + " has created a new post!",
-                        "Open the app to check it out!",
+                        createdPost.getUserId().getNickname() + " just painted something!",
+                        "Open the app for directions!",
                         "NEW_POST",
                         createdPost.getId().toString()
                 );
@@ -65,8 +65,8 @@ public class PostController {
                 try {
                     fcmService.sendNotification(
                             friendToken,
-                            createdPost.getUserId().getNickname() + " has created a new post!",
-                            "Open the app to check it out!",
+                            createdPost.getUserId().getNickname() + " just painted something!",
+                            "Open the app for directions!",
                             "NEW_POST",
                             createdPost.getId().toString()
                     );
