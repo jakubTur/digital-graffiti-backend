@@ -3,6 +3,7 @@ package edu.w04ist.si041g.backend.credential;
 import edu.w04ist.si041g.backend.credential.dto.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,20 +26,22 @@ public class CredentialController {
     }
 
     @GetMapping
-    public List<CredentialResponseBody> getAllCredentials() {
-        return credentialService.getAllCredentials();
+    public ResponseEntity<List<CredentialResponseBody>> getAllCredentials() {
+        return ResponseEntity.ok(credentialService.getAllCredentials());
     }
 
     @GetMapping("/{id}")
-    public CredentialResponseBody getCredentialById(@PathVariable Long id) {
-        return credentialService.getCredentialById(id);
+    public ResponseEntity<CredentialResponseBody> getCredentialById(@PathVariable Long id) {
+        return ResponseEntity.ok(credentialService.getCredentialById(id));
     }
 
     @PutMapping("/{id}")
-    public CredentialResponseBody updateCredential(
+    public ResponseEntity<CredentialResponseBody> updateCredential(
             @PathVariable Long id,
-            @RequestBody CredentialRequestBody request) {
-        return credentialService.updateCredential(id, request);
+            @RequestBody CredentialRequestBody request,
+            Authentication authentication) {
+
+        return ResponseEntity.ok(credentialService.updateCredential(id, request));
     }
 
     @DeleteMapping("/{id}")
@@ -48,13 +51,19 @@ public class CredentialController {
     }
 
     @PutMapping("/email/{userId}")
-    public ResponseEntity<Void> updateEmail(@PathVariable Long userId, @RequestBody CredentialRequestBody request) {
+    public ResponseEntity<Void> updateEmail(@PathVariable Long userId, @RequestBody CredentialRequestBody request, Authentication authentication) {
+        if (!Long.valueOf(authentication.getName()).equals(userId)) {
+            return ResponseEntity.status(403).build();
+        }
         credentialService.updateEmail(userId, request.getEmail());
         return ResponseEntity.ok().build();
     }
 
     @PutMapping("/password/{userId}")
-    public ResponseEntity<Void> updatePassword(@PathVariable Long userId, @RequestBody CredentialRequestBody request) {
+    public ResponseEntity<Void> updatePassword(@PathVariable Long userId, @RequestBody CredentialRequestBody request, Authentication authentication) {
+        if (!Long.valueOf(authentication.getName()).equals(userId)) {
+            return ResponseEntity.status(403).build();
+        }
         credentialService.updatePassword(userId, request.getPassword());
         return ResponseEntity.ok().build();
     }
