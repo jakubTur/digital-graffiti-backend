@@ -12,7 +12,7 @@ import java.time.Instant;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "user_relations")
+@Table(name = "user_relations_new")
 @Builder
 public class Relation {
     @Id
@@ -34,4 +34,6 @@ public class Relation {
     private Instant createdAt;
     @Column(name = "updated_at")
     private Instant updatedAt;
+    @Column(name = "blocked", nullable = false)
+    private boolean blocked = false;
 }

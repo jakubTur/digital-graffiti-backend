@@ -43,4 +43,5 @@ public interface RelationRepository extends JpaRepository<Relation, Long> {
            OR (r.sender.nickname = :secondNickname AND r.receiver.nickname = :firstNickname)
         """)
     Optional<Relation> findByInviterAndInviteeNicknames(@Param("firstNickname") String firstNickname, @Param("secondNickname") String secondNickname);
+    Optional<Relation> findBySender_IdAndReceiver_Nickname(Long inviterId, String inviteeNickname);
 }

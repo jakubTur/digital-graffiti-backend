@@ -25,6 +25,7 @@ public class RelationService {
         newRelation.setStatus(relation.getType().equals("block") ? RelationStatus.blocked : RelationStatus.pending);
         newRelation.setCreatedAt(Instant.now());
         newRelation.setUpdatedAt(Instant.now());
+        newRelation.setBlocked(relation.getType().equals("block"));
         return relationRepository.save(newRelation);
     }
 
@@ -35,7 +36,16 @@ public class RelationService {
         newRelation.setStatus(relation.getType().equals("block") ? RelationStatus.blocked : RelationStatus.pending);
         newRelation.setCreatedAt(Instant.now());
         newRelation.setUpdatedAt(Instant.now());
+        newRelation.setBlocked(relation.getType().equals("block"));
         return relationRepository.save(newRelation);
+    }
+
+    public void unblock(Long id, String nickname) {
+        Relation relation = relationRepository.findBySender_IdAndReceiver_Nickname(id, nickname)
+                .orElseThrow(() -> new RuntimeException("Relation not found"));
+        relation.setBlocked(false);
+        relation.setStatus(RelationStatus.declined);
+        relationRepository.save(relation);
     }
 
     public void deleteRelation(String firstNickname, String secondNickname) {
@@ -50,6 +60,7 @@ public class RelationService {
         if (request.getType().toLowerCase().equals("accepted") && relation.getStatus() != RelationStatus.pending) {
             throw new RuntimeException("Cannot accept a relation that is not pending");
         }
+        relation.setBlocked(request.getType().equals("block"));
         relation.setStatus(RelationStatus.valueOf(request.getType().toLowerCase()));
         relation.setReceiver(userRepository.findByNickname(request.getReceiverNickname()).orElseThrow(() -> new RuntimeException("Receiver user not found")));
         relation.setSender(userRepository.findByNickname(request.getSenderNickname()).orElseThrow(() -> new RuntimeException("Sender user not found")));

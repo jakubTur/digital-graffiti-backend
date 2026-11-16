@@ -138,18 +138,25 @@ public class RelationController {
         Relation relation = relationService.getRelationBetweenNicknames(firstNickname, secondNickname);
         return ResponseEntity.ok(toRelationResponse(relation));
     }
+    @PostMapping("/unblock/{nickname}")
+    public ResponseEntity<Void> unblockUser(@PathVariable String nickname, Authentication authentication) {
+        relationService.unblock(Long.valueOf(authentication.getName()), nickname);
+        return ResponseEntity.ok().build();
+    }
 
 
     private RelationResponse toRelationResponse(Relation relation) {
         if  (relation == null) return new RelationResponse(
             null,
             null,
-            "none"
+            "none",
+                false
         );
         return new RelationResponse(
             relation.getSender().getNickname(),
             relation.getReceiver().getNickname(),
-            relation.getStatus().toString()
+            relation.getStatus().toString(),
+            relation.isBlocked()
         );
     }
 }
