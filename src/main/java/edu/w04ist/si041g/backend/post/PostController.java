@@ -100,7 +100,7 @@ public class PostController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/nicnkame/{nickname}")
+    @GetMapping("/nickname/{nickname}")
     public ResponseEntity<List<PostResponseBody>> getPostsByNickname(@PathVariable String nickname) {
         List<Post> posts = postService.getPostsByNickname(nickname);
         return ResponseEntity.ok(posts.stream().map(this::toPostResponseBody).toList());
