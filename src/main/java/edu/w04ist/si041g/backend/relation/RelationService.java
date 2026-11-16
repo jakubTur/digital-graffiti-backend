@@ -47,6 +47,9 @@ public class RelationService {
     public Relation updateRelation(RelationNicknameRequest request) {
         Relation relation = relationRepository.findByInviterAndInviteeNicknames(request.getSenderNickname(), request.getReceiverNickname())
                 .orElseThrow(() -> new RuntimeException("Relation not found"));
+        if (request.getType().toLowerCase().equals("accepted") && relation.getStatus() != RelationStatus.pending) {
+            throw new RuntimeException("Cannot accept a relation that is not pending");
+        }
         relation.setStatus(RelationStatus.valueOf(request.getType().toLowerCase()));
         relation.setReceiver(userRepository.findByNickname(request.getReceiverNickname()).orElseThrow(() -> new RuntimeException("Receiver user not found")));
         relation.setSender(userRepository.findByNickname(request.getSenderNickname()).orElseThrow(() -> new RuntimeException("Sender user not found")));
