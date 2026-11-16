@@ -102,13 +102,4 @@ public class DrawingController {
                 drawing.getActive()
         );
     }
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteDrawing(@PathVariable Long id, Authentication authentication) {
-        Drawing drawing = drawingService.getDrawingById(id);
-        if (!Long.valueOf(authentication.getName()).equals(drawing.getUserId().getId())) {
-            return ResponseEntity.status(403).build();
-        }
-        drawingService.deleteDrawing(id);
-        return ResponseEntity.noContent().build();
-    }
 }
