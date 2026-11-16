@@ -39,6 +39,9 @@ public class DrawingService {
     }
     public void deleteDrawing(Long id){
         Drawing drawing = getDrawingById(id);
+        if (drawing == null) {
+            return;
+        }
         drawing.setActive(false);
         drawingRepository.save(drawing);
     }

@@ -8,5 +8,6 @@ public record DrawingResponseBody (
         Long postId,
         Long originId,
         String imageUrl,
-        Instant createdAt
+        Instant createdAt,
+        Boolean active
 ){}

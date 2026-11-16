@@ -9,5 +9,6 @@ public record PostResponseBody (
     String username,
     String imageUrl,
     Double latitude,
-    Double longitude
+    Double longitude,
+    boolean active
 ){}
