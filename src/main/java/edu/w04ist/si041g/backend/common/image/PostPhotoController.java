@@ -92,7 +92,7 @@ public class PostPhotoController {
 
         try {
             int updated = jdbc.update("""
-                    UPDATE public.posts_new_tmp
+                    UPDATE public.posts_new_tmp_final
                     SET background_image_path = ?
                     WHERE id = ?
                       AND poster_id = ?
@@ -166,7 +166,7 @@ public class PostPhotoController {
 
         try {
             int updated = jdbc.update("""
-                    UPDATE public.drawings
+                    UPDATE public.drawings_new_tmp_final
                     SET image_path = ?
                     WHERE id = ?
                       AND poster_id = ?

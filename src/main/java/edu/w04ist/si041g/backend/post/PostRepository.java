@@ -14,7 +14,7 @@ public interface PostRepository extends JpaRepository<Post,Long> {
     List<Post> findAllByUserId_IdAndActive(Long userId, boolean active);
     @Query(value = """
         SELECT p.*
-        FROM public.posts_new_tmp p
+        FROM public.posts_new_tmp_final p
         WHERE extensions.ST_DWithin(
             p.location,
             CAST(
