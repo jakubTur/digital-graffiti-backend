@@ -97,7 +97,7 @@ public class RelationController {
                     fcmService.sendNotification(
                             token,
                             updatedRelation.getReceiver().getNickname() + " has accepted your friend request!",
-                            "Open the app to start chatting.",
+                            "Open the app to see where they paint.",
                             "FRIEND_REQUEST_ACCEPTED",
                             updatedRelation.getId().toString()
                     );
