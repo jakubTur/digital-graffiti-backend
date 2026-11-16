@@ -1,5 +1,6 @@
 package edu.w04ist.si041g.backend.user;
 
+import edu.w04ist.si041g.backend.post.Post;
 import edu.w04ist.si041g.backend.post.PostRepository;
 import edu.w04ist.si041g.backend.user.dto.UserRequestBody;
 import edu.w04ist.si041g.backend.user.dto.UserUpdateBody;
@@ -72,8 +73,13 @@ public class UserService {
     public void deleteUser(Long id) {
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        postRepository.deleteAllByUserId_Id(id);
-        userRepository.delete(existingUser);
+        existingUser.setActive(false);
+        userRepository.save(existingUser);
+        List<Post> userPosts = postRepository.findAllByUserId_IdAndActive(id, true);
+        for (Post post : userPosts) {
+            post.setActive(false);
+            postRepository.save(post);
+        }
     }
 
     public User getUserById(Long id) {

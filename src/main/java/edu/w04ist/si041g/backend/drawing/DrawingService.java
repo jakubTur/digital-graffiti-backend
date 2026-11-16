@@ -6,6 +6,7 @@ import edu.w04ist.si041g.backend.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 
 @Service
@@ -25,9 +26,20 @@ public class DrawingService {
         if (drawing.getOriginId() != null) {
             newDrawing.setOrigin(drawingRepository.findById(drawing.getOriginId()).orElseThrow(() -> new RuntimeException("Origin drawing not found")));
         }
+        newDrawing.setCreatedAt(Instant.now());
+        newDrawing.setActive(true);
         return drawingRepository.save(newDrawing);
     }
     public List<Drawing> getDrawingByPostId(Long postId){
         return drawingRepository.findByPostId(postId);
+    }
+    public Drawing getDrawingById(Long id){
+        return drawingRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Drawing not found"));
+    }
+    public void deleteDrawing(Long id){
+        Drawing drawing = getDrawingById(id);
+        drawing.setActive(false);
+        drawingRepository.save(drawing);
     }
 }
