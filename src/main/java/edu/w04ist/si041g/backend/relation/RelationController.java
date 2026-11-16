@@ -1,5 +1,6 @@
 package edu.w04ist.si041g.backend.relation;
 
+import edu.w04ist.si041g.backend.relation.dto.RelationNicknameRequest;
 import edu.w04ist.si041g.backend.relation.dto.RelationRequest;
 import edu.w04ist.si041g.backend.relation.dto.RelationResponse;
 import org.springframework.http.ResponseEntity;
@@ -22,16 +23,34 @@ public class RelationController {
     }
 
     @PostMapping
-    ResponseEntity<Relation> createRelation(@RequestBody RelationRequest relationRequest, Authentication authentication) {
+    public ResponseEntity<Relation> createRelation(@RequestBody RelationRequest relationRequest, Authentication authentication) {
         if (!Long.valueOf(authentication.getName()).equals(relationRequest.getSenderId())) {
             return ResponseEntity.status(403).build();
         }
-
         Relation relation = relationService.createRelation(relationRequest);
         return ResponseEntity.created(URI.create("/relations/" + relation.getId())).build();
     }
+
+    @PostMapping("/nicknames")
+    public ResponseEntity<Relation> createRelationByNicknames(@RequestBody RelationNicknameRequest relationRequest) {
+        Relation relation = relationService.createRelationByNicknames(relationRequest);
+        return ResponseEntity.created(URI.create("/relations/" + relation.getId())).build();
+    }
+
+    @PutMapping
+    public ResponseEntity<Relation> updateRelation(@RequestBody RelationNicknameRequest request) {
+        Relation updatedRelation = relationService.updateRelation(request);
+        return ResponseEntity.ok(updatedRelation);
+    }
+
+    @DeleteMapping("/{firstNickname}/{secondNickname}")
+    public ResponseEntity<Void> deleteRelation(@PathVariable String firstNickname, @PathVariable String secondNickname) {
+        relationService.deleteRelation(firstNickname, secondNickname);
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/{id}/{type}")
-    ResponseEntity<List<RelationResponse>> getRelations(@PathVariable("id") Long id, @PathVariable("type") String type) {
+    public ResponseEntity<List<RelationResponse>> getRelations(@PathVariable("id") Long id, @PathVariable("type") String type) {
         List<Relation> relations = relationService.getRelationsOf(id, type);
         List<RelationResponse> relationResponses = relations.stream()
                 .map(this::toRelationResponse)
@@ -39,12 +58,12 @@ public class RelationController {
         return ResponseEntity.ok(relationResponses);
     }
     @GetMapping("/between/{firstId}/{secondId}")
-    ResponseEntity<RelationResponse> getRelationBetween(@PathVariable("firstId") Long firstId, @PathVariable("secondId") Long secondId) {
+    public ResponseEntity<RelationResponse> getRelationBetween(@PathVariable("firstId") Long firstId, @PathVariable("secondId") Long secondId) {
         Relation relation = relationService.getRelationBetween(firstId, secondId);
         return ResponseEntity.ok(toRelationResponse(relation));
     }
     @GetMapping("/between/nicknames/{firstNickname}/{secondNickname}")
-    ResponseEntity<RelationResponse> getRelationBetweenNicknames(@PathVariable("firstNickname") String firstNickname, @PathVariable("secondNickname") String secondNickname) {
+    public ResponseEntity<RelationResponse> getRelationBetweenNicknames(@PathVariable("firstNickname") String firstNickname, @PathVariable("secondNickname") String secondNickname) {
         Relation relation = relationService.getRelationBetweenNicknames(firstNickname, secondNickname);
         return ResponseEntity.ok(toRelationResponse(relation));
     }

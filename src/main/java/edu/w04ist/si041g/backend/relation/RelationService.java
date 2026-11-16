@@ -1,5 +1,6 @@
 package edu.w04ist.si041g.backend.relation;
 
+import edu.w04ist.si041g.backend.relation.dto.RelationNicknameRequest;
 import edu.w04ist.si041g.backend.relation.dto.RelationRequest;
 import edu.w04ist.si041g.backend.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,32 @@ public class RelationService {
         return relationRepository.save(newRelation);
     }
 
+    public Relation createRelationByNicknames(RelationNicknameRequest relation) {
+        Relation newRelation = new Relation();
+        newRelation.setSender(userRepository.findByNickname(relation.getSenderNickname()).orElseThrow(() -> new RuntimeException("Sender user not found")));
+        newRelation.setReceiver(userRepository.findByNickname(relation.getReceiverNickname()).orElseThrow(() -> new RuntimeException("Receiver user not found")));
+        newRelation.setStatus(relation.getType().equals("block") ? RelationStatus.blocked : RelationStatus.pending);
+        newRelation.setCreatedAt(Instant.now());
+        newRelation.setUpdatedAt(Instant.now());
+        return relationRepository.save(newRelation);
+    }
+
+    public void deleteRelation(String firstNickname, String secondNickname) {
+        Relation relation = relationRepository.findByInviterAndInviteeNicknames(firstNickname, secondNickname)
+                .orElseThrow(() -> new RuntimeException("Relation not found"));
+        relationRepository.delete(relation);
+    }
+
+    public Relation updateRelation(RelationNicknameRequest request) {
+        Relation relation = relationRepository.findByInviterAndInviteeNicknames(request.getSenderNickname(), request.getReceiverNickname())
+                .orElseThrow(() -> new RuntimeException("Relation not found"));
+        relation.setStatus(RelationStatus.valueOf(request.getType().toLowerCase()));
+        relation.setReceiver(userRepository.findByNickname(request.getReceiverNickname()).orElseThrow(() -> new RuntimeException("Receiver user not found")));
+        relation.setSender(userRepository.findByNickname(request.getSenderNickname()).orElseThrow(() -> new RuntimeException("Sender user not found")));
+        relation.setUpdatedAt(Instant.now());
+        return relationRepository.save(relation);
+    }
+
     public List<Relation> getRelationsOf(Long id, String status) {
         RelationStatus relationStatus;
         try {
@@ -33,10 +60,7 @@ public class RelationService {
         } catch (IllegalArgumentException e) {
             throw new RuntimeException("Invalid relation status: " + status);
         }
-        if (relationStatus == RelationStatus.accepted) {
-            return relationRepository.findRelationsByUserIdAndStatus(id, relationStatus);
-        }
-        return relationRepository.findAllBySender_IdAndStatus(id, relationStatus);
+        return relationRepository.findRelationsByUserIdAndStatus(id, relationStatus);
     }
     public Relation getRelationBetween(Long firstId, Long secondId) {
         return relationRepository.findByInviterAndInvitee(firstId, secondId)
