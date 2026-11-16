@@ -102,12 +102,6 @@ public class UserController {
                     HttpStatus.UNAUTHORIZED
             );
         }
-        if (!Long.valueOf(authentication.getName()).equals(userId)) {
-            throw new ResponseStatusException(
-                    HttpStatus.FORBIDDEN,
-                    "You can only upload your own profile picture"
-            );
-        }
 
         User user = userService.getUserById(userId);
 

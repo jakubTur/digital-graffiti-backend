@@ -1,7 +1,5 @@
 package edu.w04ist.si041g.backend.config;
 
-import com.google.cloud.firestore.Firestore;
-import com.google.firebase.cloud.FirestoreClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,9 +25,5 @@ public class FirebaseConfig {
             return FirebaseApp.initializeApp(options);
         }
 
-    }
-    @Bean
-    public Firestore firestore(FirebaseApp firebaseApp) {
-        return FirestoreClient.getFirestore(firebaseApp);
     }
 }

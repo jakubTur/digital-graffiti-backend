@@ -30,19 +30,16 @@ public class SecurityConfig {
                                 "/api/users/register"
                         ).permitAll()
                         .requestMatchers(
-                                HttpMethod.POST,
-                                "/api/credentials"
-                        ).permitAll()
-                        .requestMatchers(
                                 "/api/users/admin/**"
                         ).hasRole("ADMIN")
-                        .requestMatchers("/api/posts/**", "/api/users/**", "/api/relations/**", "/api/notifications/**", "/api/credentials/**")
+                        .requestMatchers("/api/posts/**", "/api/users/**", "/api/relations/**")
                         .hasAnyRole("USER", "ADMIN")
                         .requestMatchers(
                                 "/auth/login",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
-                                "/actuator/health"
+                                "/actuator/health",
+                                "/api/credentials/**"
                         ).permitAll().anyRequest().authenticated()
                 )
                 .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class).build();

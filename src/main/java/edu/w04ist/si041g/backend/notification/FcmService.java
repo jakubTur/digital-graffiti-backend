@@ -8,7 +8,7 @@ import com.google.firebase.messaging.Notification;
 
 @Service
 public class FcmService {
-    public String sendNotification(String targetToken, String title, String body, String type, String referenceId) throws Exception {
+    public String sendNotification(String targetToken, String title, String body) throws Exception {
         Notification notification = Notification.builder()
                 .setTitle(title)
                 .setBody(body)
@@ -16,8 +16,6 @@ public class FcmService {
         Message message = Message.builder()
                 .setToken(targetToken)
                 .setNotification(notification)
-                .putData("type", type)
-                .putData("referenceId", referenceId)
                 .build();
         return FirebaseMessaging.getInstance().send(message);
     }
