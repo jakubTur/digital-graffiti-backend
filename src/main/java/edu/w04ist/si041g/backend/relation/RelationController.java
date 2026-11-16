@@ -32,19 +32,31 @@ public class RelationController {
     }
 
     @PostMapping("/nicknames")
-    public ResponseEntity<Relation> createRelationByNicknames(@RequestBody RelationNicknameRequest relationRequest) {
+    public ResponseEntity<Relation> createRelationByNicknames(@RequestBody RelationNicknameRequest relationRequest, Authentication authentication) {
         Relation relation = relationService.createRelationByNicknames(relationRequest);
+        if (!Long.valueOf(authentication.getName()).equals(relation.getSender().getId())) {
+            return ResponseEntity.status(403).build();
+        }
         return ResponseEntity.created(URI.create("/relations/" + relation.getId())).build();
     }
 
     @PutMapping
-    public ResponseEntity<Relation> updateRelation(@RequestBody RelationNicknameRequest request) {
+    public ResponseEntity<Relation> updateRelation(@RequestBody RelationNicknameRequest request, Authentication authentication) {
         Relation updatedRelation = relationService.updateRelation(request);
+        if (!Long.valueOf(authentication.getName()).equals(updatedRelation.getSender().getId()) &&
+        !Long.valueOf(authentication.getName()).equals(updatedRelation.getReceiver().getId())) {
+            return ResponseEntity.status(403).build();
+        }
         return ResponseEntity.ok(updatedRelation);
     }
 
     @DeleteMapping("/{firstNickname}/{secondNickname}")
-    public ResponseEntity<Void> deleteRelation(@PathVariable String firstNickname, @PathVariable String secondNickname) {
+    public ResponseEntity<Void> deleteRelation(@PathVariable String firstNickname, @PathVariable String secondNickname,Authentication authentication) {
+        Relation relation = relationService.getRelationBetweenNicknames(firstNickname, secondNickname);
+        if (!Long.valueOf(authentication.getName()).equals(relation.getSender().getId()) &&
+        !Long.valueOf(authentication.getName()).equals(relation.getReceiver().getId())) {
+            return ResponseEntity.status(403).build();
+        }
         relationService.deleteRelation(firstNickname, secondNickname);
         return ResponseEntity.ok().build();
     }
