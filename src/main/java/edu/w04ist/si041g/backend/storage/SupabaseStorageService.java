@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
@@ -93,32 +94,49 @@ public class SupabaseStorageService {
                         + bucket + "/" + path
         );
     }
-    public String createSignedUrl(String path) {
-        SignedUrlResult result = client.post()
-                .uri(URI.create(
-                        baseUrl + "/storage/v1/object/sign/"
-                                + bucket + "/" + path
-                ))
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(Map.of("expiresIn", 3600))
-                .retrieve()
-                .body(SignedUrlResult.class);
 
-        if (result == null || result.signedURL() == null) {
+    public String createSignedUrl(String path) {
+        if (path == null || path.isBlank()) {
+            return null;
+        }
+
+        try {
+            SignedUrlResult result = client.post()
+                    .uri(URI.create(
+                            baseUrl + "/storage/v1/object/sign/"
+                                    + bucket + "/" + path
+                    ))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(Map.of("expiresIn", 3600))
+                    .retrieve()
+                    .body(SignedUrlResult.class);
+
+            if (result == null
+                    || result.signedURL() == null
+                    || result.signedURL().isBlank()) {
+                throw new IllegalStateException(
+                        "Supabase returned no signed URL for object: " + path
+                );
+            }
+
+            String url = result.signedURL();
+
+            if (url.startsWith("http://")
+                    || url.startsWith("https://")) {
+                return url;
+            }
+
+            return baseUrl
+                    + (url.startsWith("/storage/v1/") ? "" : "/storage/v1")
+                    + (url.startsWith("/") ? url : "/" + url);
+
+        } catch (HttpClientErrorException exception) {
             throw new IllegalStateException(
-                    "Could not generate photo URL"
+                    "Could not generate signed URL for Supabase object: " + path
+                            + ". Supabase response: " + exception.getResponseBodyAsString(),
+                    exception
             );
         }
-
-        String url = result.signedURL();
-
-        if (url.startsWith("https://")) {
-            return url;
-        }
-
-        return baseUrl
-                + (url.startsWith("/storage/v1/") ? "" : "/storage/v1")
-                + (url.startsWith("/") ? url : "/" + url);
     }
 
     private record SignedUrlResult(

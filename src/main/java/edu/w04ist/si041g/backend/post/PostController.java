@@ -1,8 +1,15 @@
 package edu.w04ist.si041g.backend.post;
 
+import edu.w04ist.si041g.backend.drawing.DrawingController;
+import edu.w04ist.si041g.backend.notification.FcmService;
+import edu.w04ist.si041g.backend.notification.NotificationStoreService;
 import edu.w04ist.si041g.backend.post.dto.PostRequestBody;
 import edu.w04ist.si041g.backend.post.dto.PostResponseBody;
+import edu.w04ist.si041g.backend.relation.RelationService;
 import edu.w04ist.si041g.backend.storage.SupabaseStorageService;
+import edu.w04ist.si041g.backend.user.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -16,9 +23,16 @@ import java.util.Map;
 public class PostController {
     private final PostService postService;
     private final SupabaseStorageService storage;
-    public PostController(PostService postService, SupabaseStorageService storage) {
+    private final RelationService relationService;
+    private final NotificationStoreService notificationStoreService;
+    private final FcmService fcmService;
+    private static final Logger logger = LoggerFactory.getLogger(DrawingController.class);
+    public PostController(PostService postService, SupabaseStorageService storage, RelationService relationService, NotificationStoreService notificationStoreService, FcmService fcmService) {
         this.storage = storage;
         this.postService = postService;
+        this.relationService = relationService;
+        this.notificationStoreService = notificationStoreService;
+        this.fcmService = fcmService;
     }
 
     @PostMapping("/create")
@@ -28,6 +42,43 @@ public class PostController {
         }
         Post createdPost = postService.createPost(post);
         URI location = URI.create("/api/posts/" + createdPost.getId());
+
+        List<User> friends = relationService.getFriendsOf(createdPost.getUserId().getId());
+        for (User friend : friends) {
+            try {
+                notificationStoreService.createNotification(
+                        friend.getId(),
+                        createdPost.getUserId().getNickname() + " just painted something!",
+                        "Open the app for directions!",
+                        "NEW_POST",
+                        createdPost.getId().toString()
+                );
+            } catch (Exception exception) {
+                logger.warn(
+                        "Could not create post notification for user {}",
+                        friend.getId(),
+                        exception
+                );
+            }
+            String friendToken = friend.getFirebaseToken();
+            if (friendToken != null && !friendToken.isBlank()) {
+                try {
+                    fcmService.sendNotification(
+                            friendToken,
+                            createdPost.getUserId().getNickname() + " just painted something!",
+                            "Open the app for directions!",
+                            "NEW_POST",
+                            createdPost.getId().toString()
+                    );
+                } catch (Exception exception) {
+                    logger.warn(
+                            "Could not send FCM notification to user {}",
+                            friend.getId(),
+                            exception
+                    );
+                }
+            }
+        }
 
         return ResponseEntity
                 .created(location)

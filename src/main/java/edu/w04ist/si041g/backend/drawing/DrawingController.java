@@ -1,8 +1,14 @@
 package edu.w04ist.si041g.backend.drawing;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import edu.w04ist.si041g.backend.drawing.dto.DrawingRequestBody;
 import edu.w04ist.si041g.backend.drawing.dto.DrawingResponseBody;
+import edu.w04ist.si041g.backend.notification.FcmService;
+import edu.w04ist.si041g.backend.notification.NotificationStoreService;
 import edu.w04ist.si041g.backend.storage.SupabaseStorageService;
+import edu.w04ist.si041g.backend.user.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,10 +23,14 @@ import java.util.List;
 public class DrawingController {
     private final DrawingService drawingService;
     private final SupabaseStorageService storage;
-
-    public DrawingController(DrawingService drawingService, SupabaseStorageService storage) {
+    private final FcmService fcmService;
+    private final NotificationStoreService notificationStoreService;
+    private static final Logger logger = LoggerFactory.getLogger(DrawingController.class);
+    public DrawingController(DrawingService drawingService, SupabaseStorageService storage, FcmService fcmService, NotificationStoreService notificationStoreService) {
         this.storage = storage;
         this.drawingService = drawingService;
+        this.fcmService = fcmService;
+        this.notificationStoreService = notificationStoreService;
     }
 
     @PostMapping("/add")
@@ -28,8 +38,46 @@ public class DrawingController {
         if (!Long.valueOf(authentication.getName()).equals(drawingRequestBody.getUserId())) {
             return ResponseEntity.status(403).build();
         }
-
         Drawing createdDrawing = drawingService.addDrawing(drawingRequestBody);
+
+        User receiver = createdDrawing.getOrigin() != null ?
+                createdDrawing.getOrigin().getUserId() :
+                createdDrawing.getPost().getUserId();
+        if (!createdDrawing.getUserId().getId().equals(receiver.getId())) {
+            try {
+                notificationStoreService.createNotification(
+                        receiver.getId(),
+                        createdDrawing.getUserId().getNickname() + " has vandalized your drawing!",
+                        "Open the app to thank them!",
+                        "NEW_COMMENT",
+                        createdDrawing.getId().toString()
+                );
+            } catch (Exception exception) {
+                logger.warn(
+                        "Could not create drawing notification for user {}",
+                        receiver.getId(),
+                        exception
+                );
+            }
+            String receiverToken = receiver.getFirebaseToken();
+            if (receiverToken != null && !receiverToken.isBlank()) {
+                try {
+                    fcmService.sendNotification(
+                            receiverToken,
+                            createdDrawing.getUserId().getNickname() + " has vandalized your drawing!",
+                            "Open the app to thank them!",
+                            "NEW_COMMENT",
+                            createdDrawing.getId().toString()
+                    );
+                } catch (FirebaseMessagingException exception) {
+                    logger.warn(
+                            "Could not send drawing notification to user {}",
+                            receiver.getId(),
+                            exception
+                    );
+                }
+            }
+        }
         return ResponseEntity.ok(toDrawingResponseBody(createdDrawing));
     }
 

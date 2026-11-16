@@ -26,6 +26,16 @@ public interface RelationRepository extends JpaRepository<Relation, Long> {
     """, nativeQuery = true)
     Optional<Relation> findByInviterAndInvitee(@Param("firstId") Long firstId, @Param("secondId") Long secondId);
 
+    @Query(value = """
+        SELECT CASE
+            WHEN r.inviter = :userId THEN r.invitee
+            ELSE r.inviter
+        END AS friend_id
+        FROM public.user_relations r
+        WHERE (r.inviter = :userId OR r.invitee = :userId)
+          AND r.status = 'accepted'
+    """, nativeQuery = true)
+    List<Long> findFriendsOf(@Param("userId") Long userId);
     @Query("""
         SELECT r
         FROM Relation r

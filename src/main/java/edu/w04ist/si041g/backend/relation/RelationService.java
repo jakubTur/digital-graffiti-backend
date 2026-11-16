@@ -2,6 +2,7 @@ package edu.w04ist.si041g.backend.relation;
 
 import edu.w04ist.si041g.backend.relation.dto.RelationNicknameRequest;
 import edu.w04ist.si041g.backend.relation.dto.RelationRequest;
+import edu.w04ist.si041g.backend.user.User;
 import edu.w04ist.si041g.backend.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -65,6 +66,11 @@ public class RelationService {
     public Relation getRelationBetween(Long firstId, Long secondId) {
         return relationRepository.findByInviterAndInvitee(firstId, secondId)
                 .orElse(null);
+    }
+
+    public List<User> getFriendsOf(Long userId) {
+        List<Long> friendIds = relationRepository.findFriendsOf(userId);
+        return userRepository.findAllById(friendIds);
     }
 
     public Relation getRelationBetweenNicknames(String firstNickname, String secondNickname) {
