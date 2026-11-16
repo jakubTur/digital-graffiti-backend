@@ -37,6 +37,10 @@ public class PostService {
                 .orElseThrow(() -> new RuntimeException("Post not found"));
     }
 
+    public List<Post> getPostsByNickname(String nickname) {
+        return postRepository.findAllByUserId_Nickname(nickname);
+    }
+
     public List<Post> getAllPosts() {
         return postRepository.findAll();
     }

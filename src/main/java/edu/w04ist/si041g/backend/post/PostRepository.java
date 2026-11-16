@@ -40,5 +40,5 @@ public interface PostRepository extends JpaRepository<Post,Long> {
             @Param("longitude") double longitude,
             @Param("radiusMeters") double radiusMeters
     );
-
+    List<Post> findAllByUserId_Nickname(String nickname);
 }
