@@ -1,5 +1,7 @@
 package edu.w04ist.si041g.backend.relation;
 
+import edu.w04ist.si041g.backend.notification.FcmService;
+import edu.w04ist.si041g.backend.notification.NotificationStoreService;
 import edu.w04ist.si041g.backend.relation.dto.RelationNicknameRequest;
 import edu.w04ist.si041g.backend.relation.dto.RelationRequest;
 import edu.w04ist.si041g.backend.relation.dto.RelationResponse;
@@ -15,11 +17,13 @@ import java.util.List;
 @RequestMapping("/api/relations")
 public class RelationController {
     private final RelationService relationService;
-    private final JdbcTemplate jdbc;
+    private final NotificationStoreService notificationStoreService;
+    private final FcmService fcmService;
 
-    public RelationController(RelationService relationService, JdbcTemplate jdbc) {
+    public RelationController(RelationService relationService, JdbcTemplate jdbc, NotificationStoreService notificationStoreService, FcmService fcmService) {
         this.relationService = relationService;
-        this.jdbc = jdbc;
+        this.notificationStoreService = notificationStoreService;
+        this.fcmService = fcmService;
     }
 
     @PostMapping
@@ -28,6 +32,7 @@ public class RelationController {
             return ResponseEntity.status(403).build();
         }
         Relation relation = relationService.createRelation(relationRequest);
+
         return ResponseEntity.created(URI.create("/relations/" + relation.getId())).build();
     }
 
@@ -36,6 +41,33 @@ public class RelationController {
         Relation relation = relationService.createRelationByNicknames(relationRequest);
         if (!Long.valueOf(authentication.getName()).equals(relation.getSender().getId())) {
             return ResponseEntity.status(403).build();
+        }
+        if (relation.getStatus() == RelationStatus.pending){
+            try {
+                notificationStoreService.createNotification(
+                        relation.getReceiver().getId(),
+                        relation.getSender().getNickname() + " has sent you a friend request!",
+                        "Open the app to accept or decline it.",
+                        "NEW_FRIEND_REQUEST",
+                        relation.getId().toString()
+                );
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            String token = relation.getReceiver().getFirebaseToken();
+            if (token != null && !token.isBlank()) {
+                try {
+                    fcmService.sendNotification(
+                            token,
+                            relation.getSender().getNickname() + " has sent you a friend request!",
+                            "Open the app to accept or decline it.",
+                            "NEW_FRIEND_REQUEST",
+                            relation.getId().toString()
+                    );
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
         return ResponseEntity.created(URI.create("/relations/" + relation.getId())).build();
     }
@@ -46,6 +78,33 @@ public class RelationController {
         if (!Long.valueOf(authentication.getName()).equals(updatedRelation.getSender().getId()) &&
         !Long.valueOf(authentication.getName()).equals(updatedRelation.getReceiver().getId())) {
             return ResponseEntity.status(403).build();
+        }
+        if (updatedRelation.getStatus() == RelationStatus.accepted) {
+            try {
+                notificationStoreService.createNotification(
+                        updatedRelation.getSender().getId(),
+                        updatedRelation.getReceiver().getNickname() + " has accepted your friend request!",
+                        "Open the app to start chatting.",
+                        "FRIEND_REQUEST_ACCEPTED",
+                        updatedRelation.getId().toString()
+                );
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            String token = updatedRelation.getSender().getFirebaseToken();
+            if (token != null && !token.isBlank()) {
+                try {
+                    fcmService.sendNotification(
+                            token,
+                            updatedRelation.getReceiver().getNickname() + " has accepted your friend request!",
+                            "Open the app to start chatting.",
+                            "FRIEND_REQUEST_ACCEPTED",
+                            updatedRelation.getId().toString()
+                    );
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
         return ResponseEntity.ok(updatedRelation);
     }
