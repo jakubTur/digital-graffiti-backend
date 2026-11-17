@@ -46,6 +46,7 @@ public class SecurityConfig {
                         .hasAnyRole("USER", "ADMIN")
                         .requestMatchers(
                                 "/auth/login",
+                                "/auth/refresh",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
                                 "/actuator/health"
