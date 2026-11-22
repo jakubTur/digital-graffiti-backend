@@ -1,0 +1,13 @@
+package edu.w04ist.si041g.backend.auth.verification;
+
+import edu.w04ist.si041g.backend.user.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
+
+@Repository
+public interface EmailVerificationTokenRepository extends JpaRepository<EmailVerificationToken, Long> {
+    Optional<EmailVerificationToken> findByToken(String token);
+    void deleteByUser(User user);
+}

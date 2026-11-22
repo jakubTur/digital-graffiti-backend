@@ -39,6 +39,9 @@ public class AuthService {
         if (!user.isActive()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User account is inactive");
         }
+        if (!user.isVerified()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User account is not verified");
+        }
         String accessToken = jwtService.createAccessToken(user.getId(),credential.getLogin(), user.getRole().name());
         String refreshToken = jwtService.createRefreshToken(user.getId());
         return new LoginResponse(accessToken, refreshToken, user.getId(), user.getNickname(), user.getEmail(), user.getRole().name());
@@ -61,6 +64,13 @@ public class AuthService {
                 throw new ResponseStatusException(
                         HttpStatus.FORBIDDEN,
                         "User account is inactive"
+                );
+            }
+
+            if (!user.isVerified()) {
+                throw new ResponseStatusException(
+                        HttpStatus.FORBIDDEN,
+                        "User account is not verified"
                 );
             }
 

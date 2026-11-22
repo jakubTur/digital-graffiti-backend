@@ -1,5 +1,6 @@
 package edu.w04ist.si041g.backend.user;
 
+import edu.w04ist.si041g.backend.auth.verification.AuthVerificationService;
 import edu.w04ist.si041g.backend.common.image.dto.PhotoResponseBody;
 import edu.w04ist.si041g.backend.storage.SupabaseStorageService;
 import edu.w04ist.si041g.backend.user.dto.FirebaseToken;
@@ -25,7 +26,6 @@ public class UserController {
     private final UserService userService;
     private final JdbcTemplate jdbc;
     private final SupabaseStorageService storage;
-
     public UserController(UserService userService, JdbcTemplate jdbc, SupabaseStorageService storage) {
         this.userService = userService;
         this.jdbc = jdbc;
