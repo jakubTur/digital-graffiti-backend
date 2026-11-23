@@ -6,6 +6,7 @@ import edu.w04ist.si041g.backend.user.dto.UserRequestBody;
 import edu.w04ist.si041g.backend.user.dto.UserUpdateBody;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -17,8 +18,12 @@ public class UserService {
     private UserRepository userRepository;
     @Autowired
     private PostRepository postRepository;
-    public UserService() {}
+    private final ApplicationEventPublisher publisher;
+    public UserService(ApplicationEventPublisher publisher) {
+        this.publisher = publisher;
+    }
 
+    @Transactional
     public User createUser(UserRequestBody user) {
         User newUser = new User();
         newUser.setNickname(user.getNickname());
@@ -27,7 +32,9 @@ public class UserService {
         newUser.setEmail(user.getEmail());
         newUser.setCreatedAt(Instant.now());
         newUser.setRole(UserRole.user);
-        return userRepository.save(newUser);
+        User savedUser = userRepository.save(newUser);
+        publisher.publishEvent(new UserRegisterEvent(savedUser.getId(), savedUser.getEmail()));
+        return savedUser;
     }
     public void updateFireToken(Long userId, String fireToken) {
         User existingUser = userRepository.findById(userId)
