@@ -165,7 +165,12 @@ public class CredentialService {
         request.setExpiresAt(LocalDateTime.now().plusMinutes(30));
         request.setToken(UUID.randomUUID().toString());
         credentialChangeRepository.save(request);
-        emailService.sendVerificationEmail(request.getUser().getEmail(), request.getToken(), "/api/credentials/verify-change?token=", """
+        emailService.sendVerificationEmail(
+                request.getUser().getEmail(), request.getToken(), "/api/credentials/verify-change?token=", """
+                Email for you Digital Graffiti account was changed to %s. If you did not request this change, contact US.
+                """.formatted(request.getValue()), "Email Change"
+        );
+        emailService.sendVerificationEmail(request.getValue(), request.getToken(), "/api/credentials/verify-change?token=", """
                 Please verify your email changed to (%s) by opening this link:
 
                 %s
