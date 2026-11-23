@@ -1,5 +1,6 @@
 package edu.w04ist.si041g.backend.credential;
 
+import edu.w04ist.si041g.backend.auth.verification.EmailService;
 import edu.w04ist.si041g.backend.credential.dto.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import edu.w04ist.si041g.backend.user.User;
@@ -7,7 +8,9 @@ import edu.w04ist.si041g.backend.user.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class CredentialService {
@@ -16,15 +19,21 @@ public class CredentialService {
     private final CredentialRepository credentialRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
+    private final CredentialChangeRepository credentialChangeRepository;
 
     public CredentialService(
             CredentialRepository credentialRepository,
             UserRepository userRepository,
-            PasswordEncoder passwordEncoder
+            PasswordEncoder passwordEncoder,
+            CredentialChangeRepository credentialChangeRepository,
+            EmailService emailService
     ) {
         this.credentialRepository = credentialRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.credentialChangeRepository = credentialChangeRepository;
+        this.emailService = emailService;
     }
 
 
@@ -121,8 +130,68 @@ public class CredentialService {
         Credential credential = credentialRepository.findByUser_Id(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Credential not found for user ID: " + userId));
 
-        credential.setPasswordHash(passwordEncoder.encode(newPassword));
+        credential.setPasswordHash(newPassword);
         credentialRepository.save(credential);
+    }
+
+    @Transactional
+    public void requestPasswordUpdate(Long userId, String newPassword) {
+        CredentialChangeRequest request = new CredentialChangeRequest();
+        request.setPasswordChange(true);
+        request.setUser(credentialRepository.findByUser_Id(userId).orElseThrow(() -> new IllegalArgumentException("User not found for user ID: " + userId)).getUser());
+        request.setValue(passwordEncoder.encode(newPassword));
+        request.setExpiresAt(LocalDateTime.now().plusMinutes(30));
+        request.setToken(UUID.randomUUID().toString());
+        credentialChangeRepository.save(request);
+        emailService.sendVerificationEmail(request.getUser().getEmail(), request.getToken(), "/api/credentials/verify-change?token=", """
+                Please verify your password change request by opening this link:
+
+                %s
+
+                This link may only be used once.
+                """, "Verify Password Change Request");
+    }
+
+    @Transactional
+    public void requestEmailUpdate(Long userId, String newEmail) {
+        if (credentialRepository.existsByLogin(newEmail)) {
+            throw new IllegalArgumentException("Email is already used");
+        }
+
+        CredentialChangeRequest request = new CredentialChangeRequest();
+        request.setPasswordChange(false);
+        request.setUser(credentialRepository.findByUser_Id(userId).orElseThrow(() -> new IllegalArgumentException("User not found for user ID: " + userId)).getUser());
+        request.setValue(newEmail);
+        request.setExpiresAt(LocalDateTime.now().plusMinutes(30));
+        request.setToken(UUID.randomUUID().toString());
+        credentialChangeRepository.save(request);
+        emailService.sendVerificationEmail(request.getUser().getEmail(), request.getToken(), "/api/credentials/verify-change?token=", """
+                Please verify your email changed to (%s) by opening this link:
+
+                %s
+
+                This link may only be used once.
+                """.formatted(newEmail, "%s"), "Verify Email Change Request");
+    }
+
+    @Transactional
+    public String verifyChange(String token) {
+        CredentialChangeRequest request = credentialChangeRepository.findByToken(token)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid token"));
+
+        if (request.getExpiresAt().isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("Token has expired");
+        }
+        String message;
+        if (request.isPasswordChange()) {
+            message = "Password change verified successfully";
+            updatePassword(request.getUser().getId(), request.getValue());
+        } else {
+            message = "Email change verified successfully";
+            updateEmail(request.getUser().getId(), request.getValue());
+        }
+        credentialChangeRepository.delete(request);
+        return message;
     }
 
     private Credential findCredential(Long id) {
