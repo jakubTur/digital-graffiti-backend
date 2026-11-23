@@ -2,6 +2,7 @@ package edu.w04ist.si041g.backend.user;
 
 import edu.w04ist.si041g.backend.auth.verification.AuthVerificationService;
 import edu.w04ist.si041g.backend.common.image.dto.PhotoResponseBody;
+import edu.w04ist.si041g.backend.notification.NotificationStoreService;
 import edu.w04ist.si041g.backend.storage.SupabaseStorageService;
 import edu.w04ist.si041g.backend.user.dto.FirebaseToken;
 import edu.w04ist.si041g.backend.user.dto.UserRequestBody;
@@ -26,10 +27,12 @@ public class UserController {
     private final UserService userService;
     private final JdbcTemplate jdbc;
     private final SupabaseStorageService storage;
-    public UserController(UserService userService, JdbcTemplate jdbc, SupabaseStorageService storage) {
+    private final NotificationStoreService notificationStoreService;
+    public UserController(UserService userService, JdbcTemplate jdbc, SupabaseStorageService storage, NotificationStoreService notificationStoreService) {
         this.userService = userService;
         this.jdbc = jdbc;
         this.storage = storage;
+        this.notificationStoreService = notificationStoreService;
     }
 
     @PostMapping("/register")
@@ -150,6 +153,12 @@ public class UserController {
         }
 
         return new PhotoResponseBody(path);
+    }
+
+    @DeleteMapping("/{notificationId}")
+    public ResponseEntity<Void> deleteNotification(@PathVariable String notificationId, Authentication authentication) {
+        notificationStoreService.deleteNotification(Long.valueOf(authentication.getName()), notificationId);
+        return ResponseEntity.noContent().build();
     }
 
     private UserResponseBody toUserResponseBody(User user) {

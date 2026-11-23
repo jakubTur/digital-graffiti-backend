@@ -72,5 +72,13 @@ public class NotificationStoreService {
             throw new IllegalStateException("Marking as read was failed",e);
         }
     }
+    public void deleteNotification(Long userId, String notificationId){
+        firestore
+                .collection("notifications")
+                .document(String.valueOf(userId))
+                .collection("userNotifications")
+                .document(notificationId)
+                .delete();
+    }
 }
 
