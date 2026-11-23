@@ -50,7 +50,7 @@ public class DrawingController {
                         createdDrawing.getUserId().getNickname() + " has vandalized your drawing!",
                         "Open the app to thank them!",
                         "NEW_COMMENT",
-                        createdDrawing.getId().toString()
+                        createdDrawing.getPost().getId().toString()
                 );
             } catch (Exception exception) {
                 logger.warn(
@@ -67,7 +67,7 @@ public class DrawingController {
                             createdDrawing.getUserId().getNickname() + " has vandalized your drawing!",
                             "Open the app to thank them!",
                             "NEW_COMMENT",
-                            createdDrawing.getId().toString()
+                            createdDrawing.getPost().getId().toString()
                     );
                 } catch (FirebaseMessagingException exception) {
                     logger.warn(

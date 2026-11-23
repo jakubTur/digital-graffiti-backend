@@ -85,6 +85,12 @@ public class PostController {
                 .body(Map.of("id", createdPost.getId()));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<PostResponseBody> getPostById(@PathVariable Long id) {
+        Post post = postService.getPostById(id);
+        return ResponseEntity.ok(toPostResponseBody(post));
+    }
+
     @GetMapping("/all")
     public ResponseEntity<List<PostResponseBody>> getAllPosts() {
         return ResponseEntity.ok(postService.getAllPosts().stream().map(this::toPostResponseBody).toList());
