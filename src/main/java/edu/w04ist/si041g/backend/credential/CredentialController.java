@@ -55,8 +55,13 @@ public class CredentialController {
         if (!Long.valueOf(authentication.getName()).equals(userId)) {
             return ResponseEntity.status(403).build();
         }
-        credentialService.updateEmail(userId, request.getEmail());
+        credentialService.requestEmailUpdate(userId, request.getEmail());
         return ResponseEntity.ok().build();
+    }
+    @GetMapping("verify-change")
+    public ResponseEntity<String> verifyChange(@RequestParam("token") String token) {
+        String message = credentialService.verifyChange(token);
+        return ResponseEntity.ok(message);
     }
 
     @PutMapping("/password/{userId}")
@@ -64,7 +69,7 @@ public class CredentialController {
         if (!Long.valueOf(authentication.getName()).equals(userId)) {
             return ResponseEntity.status(403).build();
         }
-        credentialService.updatePassword(userId, request.getPassword());
+        credentialService.requestPasswordUpdate(userId, request.getPassword());
         return ResponseEntity.ok().build();
     }
 }

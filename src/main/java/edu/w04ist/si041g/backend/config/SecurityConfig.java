@@ -40,6 +40,10 @@ public class SecurityConfig {
                                 "/api/credentials"
                         ).permitAll()
                         .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/credentials/verify-change"
+                        ).permitAll()
+                        .requestMatchers(
                                 "/api/users/admin/**"
                         ).hasRole("ADMIN")
                         .requestMatchers("/api/posts/**", "/api/users/**", "/api/relations/**", "/api/notifications/**", "/api/credentials/**")

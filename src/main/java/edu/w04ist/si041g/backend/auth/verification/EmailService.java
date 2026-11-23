@@ -27,10 +27,10 @@ public class EmailService {
         this.fromEmail = fromEmail;
     }
 
-    public void sendVerificationEmail(String toEmail, String token) {
+    public void sendVerificationEmail(String toEmail, String token, String address, String template_message, String subject) {
         String encodedToken = URLEncoder.encode(token, StandardCharsets.UTF_8);
         String verificationUrl = urlResolver.getBackendBaseUrl()
-                + "/auth/verify-email?token=" + encodedToken;
+                + address + encodedToken;
 
         try {
             MimeMessage message = mailSender.createMimeMessage();
@@ -42,14 +42,8 @@ public class EmailService {
 
             helper.setFrom(fromEmail);
             helper.setTo(toEmail);
-            helper.setSubject("Verify your email address");
-            helper.setText("""
-                    Please verify your email address by opening this link:
-
-                    %s
-
-                    This link may only be used once.
-                    """.formatted(verificationUrl));
+            helper.setSubject(subject);
+            helper.setText(template_message.formatted(verificationUrl));
 
             mailSender.send(message);
         } catch (MessagingException | MailException exception) {

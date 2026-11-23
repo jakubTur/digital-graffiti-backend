@@ -33,14 +33,14 @@ public class AuthVerificationService {
     }
 
     @Transactional
-    public void createAndSendVerificationToken(User user){
+    public void createAndSendVerificationToken(User user, String address, String template_message, String subject) {
         emailVerificationTokenRepository.deleteByUser(user);
         EmailVerificationToken token = new EmailVerificationToken();
         token.setUser(user);
         token.setToken(UUID.randomUUID().toString());
         token.setExpiresAt(LocalDateTime.now().plusMinutes(tokenExpirationMinutes));
         emailVerificationTokenRepository.save(token);
-        emailService.sendVerificationEmail(user.getEmail(), token.getToken());
+        emailService.sendVerificationEmail(user.getEmail(), token.getToken(), address, template_message, subject);
     }
 
     @Transactional
@@ -67,10 +67,19 @@ public class AuthVerificationService {
         try {
             User user = userRepository.findById(event.userId())
                     .orElseThrow(() -> new RuntimeException("User not found"));
-            createAndSendVerificationToken(user);
+            createAndSendVerificationToken(user, "/auth/verify-email?token=", """
+                    Please verify your email address by opening this link:
+
+                    %s
+
+                    This link may only be used once.
+                    """, "Verify your email address");
         } catch (RuntimeException e) {
             System.err.println("Error during user registration: " + e.getMessage());
             e.printStackTrace();
         }
     }
+
+
+
 }
