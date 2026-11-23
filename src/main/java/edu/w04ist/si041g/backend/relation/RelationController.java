@@ -128,6 +128,13 @@ public class RelationController {
                 .toList();
         return ResponseEntity.ok(relationResponses);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<RelationResponse> getRelation(@PathVariable("id") Long id) {
+        Relation relation = relationService.getRelation(id);
+        return ResponseEntity.ok(toRelationResponse(relation));
+    }
+
     @GetMapping("/between/{firstId}/{secondId}")
     public ResponseEntity<RelationResponse> getRelationBetween(@PathVariable("firstId") Long firstId, @PathVariable("secondId") Long secondId) {
         Relation relation = relationService.getRelationBetween(firstId, secondId);

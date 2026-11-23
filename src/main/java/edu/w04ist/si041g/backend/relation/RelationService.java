@@ -18,6 +18,11 @@ public class RelationService {
     private UserRepository userRepository;
     public RelationService() {}
 
+    public Relation getRelation(Long id) {
+        return relationRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Relation not found"));
+    }
+
     public Relation createRelation(RelationRequest relation) {
         Relation newRelation = new Relation();
         newRelation.setSender(userRepository.findById(relation.getSenderId()).orElseThrow(() -> new RuntimeException("Sender user not found")));
