@@ -8,6 +8,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
@@ -40,13 +41,13 @@ public class EmailService {
                     StandardCharsets.UTF_8.name()
             );
 
-            helper.setFrom(fromEmail);
+            helper.setFrom(fromEmail, "DigitalGraffiti");
             helper.setTo(toEmail);
             helper.setSubject(subject);
             helper.setText(template_message.formatted(verificationUrl));
 
             mailSender.send(message);
-        } catch (MessagingException | MailException exception) {
+        } catch (UnsupportedEncodingException | MessagingException | MailException exception) {
             throw new IllegalStateException(
                     "Unable to send verification email to " + toEmail,
                     exception
