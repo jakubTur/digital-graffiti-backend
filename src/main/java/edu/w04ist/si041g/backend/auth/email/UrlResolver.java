@@ -1,4 +1,4 @@
-package edu.w04ist.si041g.backend.auth.verification;
+package edu.w04ist.si041g.backend.auth.email;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

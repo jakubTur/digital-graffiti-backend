@@ -3,7 +3,7 @@ package edu.w04ist.si041g.backend.auth;
 import edu.w04ist.si041g.backend.auth.dto.LoginRequest;
 import edu.w04ist.si041g.backend.auth.dto.LoginResponse;
 import edu.w04ist.si041g.backend.auth.dto.RefreshTokenRequest;
-import edu.w04ist.si041g.backend.auth.verification.AuthVerificationService;
+import edu.w04ist.si041g.backend.auth.email.AuthVerificationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,6 +29,17 @@ public class AuthController {
     @GetMapping("/verify-email")
     public ResponseEntity<String> verifyEmail(@RequestParam("token") String token) {
         String message = verificationService.verifyEmail(token);
+        return ResponseEntity.ok(message);
+    }
+
+    @GetMapping("/reset-password/{email}")
+    public ResponseEntity<Void> resetPassword(@PathVariable("email") String email) {
+        verificationService.sendResetPasswordMail(email);
+        return ResponseEntity.ok().build();
+    }
+    @GetMapping("/reset-password/confirm")
+    public ResponseEntity<String> confirmResetPassword(@RequestParam("token") String token) {
+        String message = verificationService.verifyResetPasswordToken(token);
         return ResponseEntity.ok(message);
     }
 }

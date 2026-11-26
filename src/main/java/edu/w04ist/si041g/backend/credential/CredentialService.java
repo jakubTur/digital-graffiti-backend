@@ -1,6 +1,6 @@
 package edu.w04ist.si041g.backend.credential;
 
-import edu.w04ist.si041g.backend.auth.verification.EmailService;
+import edu.w04ist.si041g.backend.auth.email.EmailService;
 import edu.w04ist.si041g.backend.credential.dto.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import edu.w04ist.si041g.backend.user.User;
@@ -217,6 +217,10 @@ public class CredentialService {
                 credential.getUser().getId(),
                 credential.getLogin()
         );
+    }
+
+    public String encodePassword(String password) {
+        return passwordEncoder.encode(password);
     }
 
     public boolean verifyPassword(String login, String password) {

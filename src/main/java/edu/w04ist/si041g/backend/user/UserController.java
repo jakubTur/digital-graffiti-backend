@@ -1,6 +1,5 @@
 package edu.w04ist.si041g.backend.user;
 
-import edu.w04ist.si041g.backend.auth.verification.AuthVerificationService;
 import edu.w04ist.si041g.backend.common.image.dto.PhotoResponseBody;
 import edu.w04ist.si041g.backend.notification.NotificationStoreService;
 import edu.w04ist.si041g.backend.storage.SupabaseStorageService;

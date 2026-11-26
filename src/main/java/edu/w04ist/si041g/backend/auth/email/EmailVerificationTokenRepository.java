@@ -1,4 +1,4 @@
-package edu.w04ist.si041g.backend.auth.verification;
+package edu.w04ist.si041g.backend.auth.email;
 
 import edu.w04ist.si041g.backend.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;

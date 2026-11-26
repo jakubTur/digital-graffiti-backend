@@ -1,4 +1,4 @@
-package edu.w04ist.si041g.backend.auth.verification;
+package edu.w04ist.si041g.backend.auth.email;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -49,6 +49,28 @@ public class EmailService {
         } catch (MessagingException | MailException exception) {
             throw new IllegalStateException(
                     "Unable to send verification email to " + toEmail,
+                    exception
+            );
+        }
+    }
+    public void sendResetPasswordEmail(String toEmail, String password) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(
+                    message,
+                    false,
+                    StandardCharsets.UTF_8.name()
+            );
+
+            helper.setFrom(fromEmail);
+            helper.setTo(toEmail);
+            helper.setSubject("New Password");
+            helper.setText("Your password was changed to: " + password);
+
+            mailSender.send(message);
+        } catch (MessagingException | MailException exception) {
+            throw new IllegalStateException(
+                    "Unable to send password reset email to " + toEmail,
                     exception
             );
         }
